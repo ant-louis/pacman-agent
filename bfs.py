@@ -12,9 +12,7 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-
-        #List to contain the path to the next food item
-        self.nextactions = list()
+        self.nextactions = list() #List to contain the final path to the goal
         
     def construct_path(self, state, meta):
         """ 
@@ -46,20 +44,18 @@ class PacmanAgent(Agent):
         ----------
         - `state`: the current game state. 
         """
-        # a FIFO queue
-        queue = deque()
+        
+        queue = deque() # a FIFO queue
+        visited = set() # an empty set to maintain visited nodes
 
-        # an empty set to maintain visited nodes
-        visited = set()
-
-        # a dictionary to maintain meta information (used for path formation)
-        # key -> (parent state, action to reach child)
+        # a dictionary to maintain path information : key -> (parent state, action to reach child)
         meta = dict()
-
-        queue.append(state) #Append root
         meta[state] = (None, None)
 
-        while queue: # While not empty
+        queue.append(state) #Append root
+
+        # While not empty
+        while queue: 
             #Pick one available state
             current_node = queue.popleft()
 
@@ -92,7 +88,6 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
-
         if not self.nextactions:
             self.nextactions = self.computeNextTree(state)
 
