@@ -36,7 +36,7 @@ class PacmanAgent(Agent):
         action_list.reverse()
         return action_list
 
-    def computeNextTree(self, state):
+    def compute_tree(self, state):
         """
         Given a pacman state, computes a path from that state to a state
         where pacman has eaten one food dot.
@@ -52,7 +52,8 @@ class PacmanAgent(Agent):
         meta = dict()
         meta[state] = (None, None)
 
-        queue.append(state) #Append root
+        #Append root
+        queue.append(state) 
 
         # While not empty
         while queue: 
@@ -89,6 +90,6 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         if not self.nextactions:
-            self.nextactions = self.computeNextTree(state)
+            self.nextactions = self.compute_tree(state)
 
         return self.nextactions.pop(0)
