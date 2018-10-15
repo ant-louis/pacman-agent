@@ -5,12 +5,6 @@ from collections import deque
 
 class PacmanAgent(Agent):
 
-    # variable to keep track of the dot foods left
-    nb_foods = None
-
-    #List to contain the path to the next food iteù
-    nextactions = list()
-    
     def __init__(self, args):
         """
         Arguments:
@@ -18,8 +12,10 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-        
 
+        #List to contain the path to the next food item
+        self.nextactions = list()
+        
     def construct_path(self, state, meta):
         """ 
         Produce a backtrace of the actions taken to find the food dot, using the 
@@ -42,7 +38,6 @@ class PacmanAgent(Agent):
         action_list.reverse()
         return action_list
 
-
     def computeNextTree(self, state):
         """
         Given a pacman state, computes a path from that state to a state
@@ -51,7 +46,6 @@ class PacmanAgent(Agent):
         ----------
         - `state`: the current game state. 
         """
-
         # a FIFO queue
         queue = deque()
 
@@ -70,15 +64,14 @@ class PacmanAgent(Agent):
             current_node = queue.popleft()
 
             # We found one food dot so we stop and compute a path.
-            if current_node.getNumFood() < self.nb_foods:
-                self.nb_foods = current_node.getNumFood()
+            if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
             #Generate the next succesors of the current state
             successors = current_node.generatePacmanSuccessors()
             for successor in successors:
                 #Successor was already visited
-                if (successor[0].getPacmanPosition(), successor[0].getNumFood()) in visited:
+                if hash((successor[0].getPacmanPosition(), successor[0].getFood())) in visited:
                     continue
                 #Successor wasn't visisted, we enqueue it
                 if successor[0] not in queue:
@@ -86,25 +79,19 @@ class PacmanAgent(Agent):
                     queue.append(successor[0])
             
             # add the current node to the visited set
-            visited.add((current_node.getPacmanPosition(), current_node.getNumFood()))
+            visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
          
-
     def get_action(self, state):
 
         """
         Given a pacman game state, returns a legal move.
         Arguments:
         ----------
-        - `state`: the current game state. See FAQ and class
-                   `pacman.GameState`.
+        - `state`: the current game state.
         Return:
         -------
         - A legal move as defined in `game.Directions`.
         """
-
-        #Used to make sure that pacman eats a dot before passing
-        #through the same position
-        self.nb_foods = state.getNumFood()
 
         if not self.nextactions:
             self.nextactions = self.computeNextTree(state)
