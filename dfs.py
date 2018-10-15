@@ -4,11 +4,6 @@ from pacman_module.pacman import Directions
 
 class PacmanAgent(Agent):
 
-    nb_foods = None
-
-    #List to contain the path to the next food
-    nextactions = list()
-    
     def __init__(self, args):
         """
         Arguments:
@@ -16,19 +11,16 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
+        self.nextactions = list() #List to contain the final path to the goal
         
-
     def construct_path(self, state, meta):
         """ 
         Produce a backtrace of the actions taken to find the food dot, using the 
         recorded meta dictionary
-
         Arguments:
         ----------
-        - `state`: the current game state.
-
+        - `state`: the current game state. 
         - `meta`: dictionnary containing the path information from one node to another
-
         Return:
         -------
         - A list of legal moves as defined in `game.Directions`
@@ -43,72 +35,60 @@ class PacmanAgent(Agent):
         action_list.reverse()
         return action_list
 
-
-    def computeNextTree(self, state):
+    def compute_tree(self, state):
         """
         Given a pacman state, computes a path from that state to a state
         where pacman has eaten one food dot.
-
         Arguments:
         ----------
-        - `state`: the current game state.
+        - `state`: the current game state. 
         """
+        
+        stack = list() # a stack
+        visited = set() # an empty set to maintain visited nodes
 
-        # a stack for the nodes to explore
-        stack = list()
-
-        # an empty set to maintain visited nodes
-        visited = set()
-
-        # a dictionary to maintain meta information (used for path formation)
-        # key -> (parent state, action to reach child)
+        # a dictionary to maintain path information : key -> (parent state, action to reach child)
         meta = dict()
-
-        stack.append(state) #Append root
         meta[state] = (None, None)
 
-        while stack: # While not empty
+        #Append root
+        stack.append(state) 
+
+        # While not empty
+        while stack: 
             #Pick one available state
             current_node = stack.pop()
 
             # We found one food dot so we stop and compute a path.
-            if current_node.getNumFood() < self.nb_foods:
-                self.nb_foods = current_node.getNumFood()
+            if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
             #Generate the next succesors of the current state
             successors = current_node.generatePacmanSuccessors()
             for successor in successors:
                 #Successor was already visited
-                if (successor[0].getPacmanPosition(), successor[0].getNumFood()) in visited:
+                if hash((successor[0].getPacmanPosition(), successor[0].getFood())) in visited:
                     continue
-                #Successor wasn't visisted, we push it onto the stack
+                #Successor wasn't visisted, we enstack it
                 if successor[0] not in stack:
                     meta[successor[0]] = (current_node, successor[1]) # create metadata for these nodes
                     stack.append(successor[0])
             
-            visited.add((current_node.getPacmanPosition(), current_node.getNumFood()))
+            # add the current node to the visited set
+            visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
          
     def get_action(self, state):
 
         """
         Given a pacman game state, returns a legal move.
-
         Arguments:
         ----------
-        - `state`: the current game state. See FAQ and class
-                   `pacman.GameState`.
-
+        - `state`: the current game state.
         Return:
         -------
         - A legal move as defined in `game.Directions`.
         """
-
-        #Used to make sure that pacman eats a dot before passing
-        #through the same position
-        self.nb_foods = state.getNumFood()
-
         if not self.nextactions:
-            self.nextactions = self.computeNextTree(state)
+            self.nextactions = self.compute_tree(state)
 
         return self.nextactions.pop(0)
