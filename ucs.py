@@ -56,28 +56,28 @@ class PacmanAgent(Agent):
         fringe.push(state,0) 
         
         # While not empty
-        while fringe: 
+        while not fringe.isEmpty(): 
             #Pick one available state
-            current_node = fringe.pop()
+            current_cost, current_node = fringe.pop()
 
-            if current_node[1].isWin():
-                return self.construct_path(current_node[1], meta)
+            if current_node.isWin():
+                return self.construct_path(current_node, meta)
 
-            #Generate the next successors of the current state
-            successors = current_node[1].generatePacmanSuccessors()
-            for successor in successors:
-                #Successor was already visited
-                if hash((successor[0].getPacmanPosition(), successor[0].getFood())) not in visited:
+            #For each successor of the current node
+            for next_node, next_action in current_node.generatePacmanSuccessors():
+                #Check if it was already visited
+                if hash((next_node.getPacmanPosition(), next_node.getFood())) not in visited:
                     #Successor wasn't visisted, we enfringe it
-                    meta[successor[0]] = (current_node[1], successor[1]) 
+                    meta[next_node] = (current_node, next_action) 
                     
-                    x, y = successor[0].getPacmanPosition()
                     #Assign priority based on the presence of food
-                    priority = 0 if successor[0].hasFood(x, y) else 1 
-                    fringe.push(successor[0], current_node[0] + priority)
+                    x, y = next_node.getPacmanPosition()
+                    new_cost = 0 if next_node.hasFood(x, y) else 1
+
+                    fringe.push(next_node, current_cost + new_cost)
 
             #Add the current node to the visited set
-            visited.add(hash((current_node[1].getPacmanPosition(), current_node[1].getFood())))
+            visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
          
     def get_action(self, state):
 

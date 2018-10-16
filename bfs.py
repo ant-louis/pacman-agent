@@ -64,16 +64,15 @@ class PacmanAgent(Agent):
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
-            #Generate the next succesors of the current state
-            successors = current_node.generatePacmanSuccessors()
-            for successor in successors:
-                #Successor was already visited
-                if hash((successor[0].getPacmanPosition(), successor[0].getFood())) in visited:
+           #For each successor of the current node
+            for next_node, next_action in current_node.generatePacmanSuccessors():
+                #Check if it was already visited
+                if hash((next_node.getPacmanPosition(), next_node.getFood())) in visited:
                     continue
                 #Successor wasn't visisted, we enfringe it
-                if successor[0] not in fringe:
-                    meta[successor[0]] = (current_node, successor[1]) # create metadata for these nodes
-                    fringe.append(successor[0])
+                if next_node not in fringe:
+                    meta[next_node] = (current_node, next_action) # create metadata for these nodes
+                    fringe.append(next_node)
             
             # add the current node to the visited set
             visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
