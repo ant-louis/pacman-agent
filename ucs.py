@@ -1,6 +1,5 @@
 from pacman_module.game import Agent
 from pacman_module.pacman import Directions
-from collections import deque
 from pacman_module.util import PriorityQueue
 
 
@@ -13,9 +12,7 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-
-        #List to contain the path to the next food item
-        self.nextactions = list()
+        self.nextactions = list() #List to contain the path to the next food item
         
     def construct_path(self, state, meta):
         """ 
@@ -48,22 +45,20 @@ class PacmanAgent(Agent):
         ----------
         - `state`: the current game state. 
         """
-        # a FIFO queue
-        pqueue = PriorityQueue()
+        fringe = PriorityQueue() # a priority queue
+        visited = set() # an empty set to maintain visited nodes
 
-        # an empty set to maintain visited nodes
-        visited = set()
-
-        # a dictionary to maintain meta information (used for path formation)
-        # key -> (parent state, action to reach child)
+        # a dictionary to maintain path information : key -> (parent state, action to reach child)
         meta = dict()
-
-        pqueue.push(state,0) #Append root
         meta[state] = (None, None)
 
-        while pqueue: # While not empty
+        #Append root
+        fringe.push(state,0) 
+        
+        # While not empty
+        while fringe: 
             #Pick one available state
-            current_node = pqueue.pop()
+            current_node = fringe.pop()
 
             if current_node[1].isWin():
                 return self.construct_path(current_node[1], meta)
@@ -73,13 +68,13 @@ class PacmanAgent(Agent):
             for successor in successors:
                 #Successor was already visited
                 if hash((successor[0].getPacmanPosition(), successor[0].getFood())) not in visited:
-                    #Successor wasn't visisted, we enpqueue it
+                    #Successor wasn't visisted, we enfringe it
                     meta[successor[0]] = (current_node[1], successor[1]) 
                     
                     x, y = successor[0].getPacmanPosition()
                     #Assign priority based on the presence of food
                     priority = 0 if successor[0].hasFood(x, y) else 1 
-                    pqueue.push(successor[0], current_node[0] + priority)
+                    fringe.push(successor[0], current_node[0] + priority)
 
             #Add the current node to the visited set
             visited.add(hash((current_node[1].getPacmanPosition(), current_node[1].getFood())))
@@ -95,7 +90,6 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
-
         if not self.nextactions:
             self.nextactions = self.computeNextTree(state)
 
