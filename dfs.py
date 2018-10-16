@@ -44,7 +44,7 @@ class PacmanAgent(Agent):
         ----------
         - `state`: the current game state. 
         """
-        stack = Stack() # a stack
+        fringe = Stack() # a stack
         visited = set() # an empty set to maintain visited nodes
 
         # a dictionary to maintain path information : key -> (parent state, action to reach child)
@@ -52,12 +52,12 @@ class PacmanAgent(Agent):
         meta[state] = (None, None)
 
         #Append root
-        stack.push(state) 
+        fringe.push(state) 
 
         # While not empty
-        while stack: 
+        while fringe: 
             #Pick one available state
-            current_node = stack.pop()
+            current_node = fringe.pop()
 
             # We found one food dot so we stop and compute a path.
             if current_node.isWin():
@@ -69,7 +69,7 @@ class PacmanAgent(Agent):
                 #Successor was already visited
                 if hash((successor[0].getPacmanPosition(), successor[0].getFood())) not in visited:
                     meta[successor[0]] = (current_node, successor[1]) # create metadata for these nodes
-                    stack.push(successor[0])
+                    fringe.push(successor[0])
             
             # add the current node to the visited set
             visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))

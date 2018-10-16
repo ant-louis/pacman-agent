@@ -45,7 +45,7 @@ class PacmanAgent(Agent):
         - `state`: the current game state. 
         """
         
-        queue = deque() # a FIFO queue
+        fringe = deque() # a FIFO queue
         visited = set() # an empty set to maintain visited nodes
 
         # a dictionary to maintain path information : key -> (parent state, action to reach child)
@@ -53,12 +53,12 @@ class PacmanAgent(Agent):
         meta[state] = (None, None)
 
         #Append root
-        queue.append(state) 
+        fringe.append(state) 
 
         # While not empty
-        while queue: 
+        while fringe: 
             #Pick one available state
-            current_node = queue.popleft()
+            current_node = fringe.popleft()
 
             # We found one food dot so we stop and compute a path.
             if current_node.isWin():
@@ -70,10 +70,10 @@ class PacmanAgent(Agent):
                 #Successor was already visited
                 if hash((successor[0].getPacmanPosition(), successor[0].getFood())) in visited:
                     continue
-                #Successor wasn't visisted, we enqueue it
-                if successor[0] not in queue:
+                #Successor wasn't visisted, we enfringe it
+                if successor[0] not in fringe:
                     meta[successor[0]] = (current_node, successor[1]) # create metadata for these nodes
-                    queue.append(successor[0])
+                    fringe.append(successor[0])
             
             # add the current node to the visited set
             visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
