@@ -1,26 +1,26 @@
 from matplotlib import pyplot as plt
 import numpy as np
 def buildPlot(title, array, ylabel, filename):
-    plt.figure(figsize=(10, 7))
-    plt.title(title)
-    plt.ylabel(ylabel)
-
-    nb_algo = 4
     nb_maps = 3
-    bar_width = .5
-    bar_positions = np.arange(nb_maps)*bar_width*(nb_algo+1)
-    print(bar_positions)
-
-    for i in range(nb_algo):
-        for j in range(nb_maps):
-            plt.bar(bar_positions[j]+bar_width*i, array[j][i], width=bar_width,color=['black', 'red', 'green', 'blue'])
-
     maps = ["small", "medium", "large"]
     algorithms = ["dfs", "bfs", "ucs", "astar"]
-    plt.xticks(bar_positions+(nb_algo-1)/2*bar_width, ["Map: {}".format(i) for i in maps])
-    plt.legend(["Algo {}".format(i) for i in algorithms])
-    plt.savefig("{}.svg".format(filename), format="svg")
-    plt.show()
+    colors = ['#a7d49b', '#92ac86', '#696047', '#55251d']
+    nb_algo = 4
+    bar_width = .5
+    
+    for j in range(nb_maps):
+        plt.figure(figsize=(8, 5))
+        plt.title(title)
+        plt.ylabel(ylabel)
+        plt.xlabel("Map: {}".format(maps[j]))
+        plt.xticks([])
+
+        for i in range(nb_algo):
+            plt.bar(0.+bar_width*i, array[j][i], width=bar_width,color=colors[i])
+            plt.legend(["Algo {}".format(i) for i in algorithms])
+
+        plt.savefig("{}_{}.svg".format(filename,maps[j]), format="svg")
+        plt.show()
 
 
 #[DFS BFS UCS A*]

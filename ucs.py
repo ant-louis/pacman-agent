@@ -1,6 +1,5 @@
 from pacman_module.game import Agent
 from pacman_module.pacman import Directions
-from collections import deque
 from pacman_module.util import PriorityQueue
 
 
@@ -13,9 +12,7 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-
-        #List to contain the path to the next food item
-        self.nextactions = list()
+        self.nextactions = list() #List to contain the path to the next food item
         
     def construct_path(self, state, meta):
         """ 
@@ -40,49 +37,50 @@ class PacmanAgent(Agent):
         action_list.reverse()
         return action_list
 
-    def computeNextTree(self, state):
+    def compute_tree(self, state):
         """
         Given a pacman state, computes a path from that state to a state
         where pacman has eaten one food dot.
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
+        Return:
+        -------
+        - A list of legal moves as defined in `game.Directions`
         """
-        # a FIFO queue
-        pqueue = PriorityQueue()
+        fringe = PriorityQueue() # a priority queue
+        visited = set() # an empty set to maintain visited nodes
 
-        # an empty set to maintain visited nodes
-        visited = set()
-
-        # a dictionary to maintain meta information (used for path formation)
-        # key -> (parent state, action to reach child)
+        # a dictionary to maintain path information : key -> (parent state, action to reach child)
         meta = dict()
-
-        pqueue.push(state,0) #Append root
         meta[state] = (None, None)
 
-        while pqueue: # While not empty
+        #Append root
+        fringe.update(state,1)
+        
+        # While not empty
+        while not fringe.isEmpty(): 
             #Pick one available state
-            current_node = pqueue.pop()
+            current_cost, current_node = fringe.pop()
 
-            if current_node[1].isWin():
-                return self.construct_path(current_node[1], meta)
+            if current_node.isWin():
+                return self.construct_path(current_node, meta)
 
-            #Generate the next successors of the current state
-            successors = current_node[1].generatePacmanSuccessors()
-            for successor in successors:
-                #Successor was already visited
-                if hash((successor[0].getPacmanPosition(), successor[0].getFood())) not in visited:
-                    #Successor wasn't visisted, we enpqueue it
-                    meta[successor[0]] = (current_node[1], successor[1]) 
+            #For each successor of the current node
+            for next_node, next_action in current_node.generatePacmanSuccessors():
+                #Check if it was already visited
+                if hash((next_node.getPacmanPosition(), next_node.getFood())) not in visited:
+                    #Successor wasn't visisted, we enfringe it
+                    meta[next_node] = (current_node, next_action) 
                     
-                    x, y = successor[0].getPacmanPosition()
                     #Assign priority based on the presence of food
-                    priority = 0 if successor[0].hasFood(x, y) else 1 
-                    pqueue.push(successor[0], current_node[0] + priority)
+                    x,y = next_node.getPacmanPosition()
+                    cost = 0 if current_node.hasFood(x,y) else 1
+                    fringe.update(next_node, current_cost + cost)
+
 
             #Add the current node to the visited set
-            visited.add(hash((current_node[1].getPacmanPosition(), current_node[1].getFood())))
+            visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
          
     def get_action(self, state):
 
@@ -95,8 +93,7 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
-
         if not self.nextactions:
-            self.nextactions = self.computeNextTree(state)
+            self.nextactions = self.compute_tree(state)
 
         return self.nextactions.pop(0)

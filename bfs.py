@@ -45,7 +45,7 @@ class PacmanAgent(Agent):
         - `state`: the current game state. 
         """
         
-        queue = deque() # a FIFO queue
+        fringe = deque() # a FIFO queue
         visited = set() # an empty set to maintain visited nodes
 
         # a dictionary to maintain path information : key -> (parent state, action to reach child)
@@ -53,27 +53,26 @@ class PacmanAgent(Agent):
         meta[state] = (None, None)
 
         #Append root
-        queue.append(state) 
+        fringe.append(state) 
 
         # While not empty
-        while queue: 
+        while fringe: 
             #Pick one available state
-            current_node = queue.popleft()
+            current_node = fringe.popleft()
 
             # We found one food dot so we stop and compute a path.
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
-            #Generate the next succesors of the current state
-            successors = current_node.generatePacmanSuccessors()
-            for successor in successors:
-                #Successor was already visited
-                if hash((successor[0].getPacmanPosition(), successor[0].getFood())) in visited:
+           #For each successor of the current node
+            for next_node, next_action in current_node.generatePacmanSuccessors():
+                #Check if it was already visited
+                if hash((next_node.getPacmanPosition(), next_node.getFood())) in visited:
                     continue
-                #Successor wasn't visisted, we enqueue it
-                if successor[0] not in queue:
-                    meta[successor[0]] = (current_node, successor[1]) # create metadata for these nodes
-                    queue.append(successor[0])
+                #Successor wasn't visisted, we enfringe it
+                if next_node not in fringe:
+                    meta[next_node] = (current_node, next_action) # create metadata for these nodes
+                    fringe.append(next_node)
             
             # add the current node to the visited set
             visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
