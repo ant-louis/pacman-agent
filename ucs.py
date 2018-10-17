@@ -37,13 +37,16 @@ class PacmanAgent(Agent):
         action_list.reverse()
         return action_list
 
-    def computeNextTree(self, state):
+    def compute_tree(self, state):
         """
         Given a pacman state, computes a path from that state to a state
         where pacman has eaten one food dot.
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
+        Return:
+        -------
+        - A list of legal moves as defined in `game.Directions`
         """
         fringe = PriorityQueue() # a priority queue
         visited = set() # an empty set to maintain visited nodes
@@ -53,7 +56,7 @@ class PacmanAgent(Agent):
         meta[state] = (None, None)
 
         #Append root
-        fringe.push(state,0) 
+        fringe.update(state,1)
         
         # While not empty
         while not fringe.isEmpty(): 
@@ -71,10 +74,10 @@ class PacmanAgent(Agent):
                     meta[next_node] = (current_node, next_action) 
                     
                     #Assign priority based on the presence of food
-                    x, y = next_node.getPacmanPosition()
-                    new_cost = 0 if next_node.hasFood(x, y) else 1
+                    x,y = next_node.getPacmanPosition()
+                    cost = 0 if current_node.hasFood(x,y) else 1
+                    fringe.update(next_node, current_cost + cost)
 
-                    fringe.push(next_node, current_cost + new_cost)
 
             #Add the current node to the visited set
             visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
@@ -91,6 +94,6 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         if not self.nextactions:
-            self.nextactions = self.computeNextTree(state)
+            self.nextactions = self.compute_tree(state)
 
         return self.nextactions.pop(0)
