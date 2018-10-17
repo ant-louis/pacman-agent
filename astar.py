@@ -1,6 +1,7 @@
 from pacman_module.game import Agent
 from pacman_module.pacman import Directions
 from pacman_module.util import PriorityQueue
+import math
 
 class PacmanAgent(Agent):
 
@@ -12,6 +13,13 @@ class PacmanAgent(Agent):
         """
         self.args = args
         self.nextactions = list() #List to contain the final path to the goal
+    
+    def nullHeuristic(self, state):
+        """
+        A heuristic function estimates the cost from the current state to the nearest
+        goal in the provided SearchProblem.  This heuristic is trivial.
+        """
+        return 0
 
     def manhattan_distance(self, current, goal):
         """
@@ -21,12 +29,43 @@ class PacmanAgent(Agent):
         dy = abs(current[1] - goal[1])
         return dx + dy
 
-    def nullHeuristic(self, state):
+    def manhattan_maximum(self, state):
         """
-        A heuristic function estimates the cost from the current state to the nearest
-        goal in the provided SearchProblem.  This heuristic is trivial.
+        Compute the minimum manhattan distance between the state and all foods
         """
-        return 0
+        max_man = math.inf
+        x, y = state.getPacmanPosition()
+        current_food = state.getFood()
+
+        #For each position check if there is food or not
+        for i in range(current_food.width):
+            for j in range(current_food.height):
+                if current_food[i][j]:
+                    #Then compute manhattan distance from state to that food
+                    new_man = self.manhattan_distance((x,y),(i,j))
+                    #If new distance is smaller than previous minimum one, update
+                    if new_man > max_man:
+                        max_man = new_man
+        return max_man
+
+    def manhattan_minimum(self, state):
+        """
+        Compute the minimum manhattan distance between the state and all foods
+        """
+        min_man = math.inf
+        x, y = state.getPacmanPosition()
+        current_food = state.getFood()
+
+        #For each position check if there is food or not
+        for i in range(current_food.width):
+            for j in range(current_food.height):
+                if current_food[i][j]:
+                    #Then compute manhattan distance from state to that food
+                    new_man = self.manhattan_distance((x,y),(i,j))
+                    #If new distance is smaller than previous minimum one, update
+                    if new_man < min_man:
+                        min_man = new_man
+        return min_man
 
     def construct_path(self, state, meta):
         """ 
@@ -111,6 +150,6 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         if not self.nextactions:
-            self.nextactions = self.compute_tree(state,self.nullHeuristic)
+            self.nextactions = self.compute_tree(state,self.manhattan_minimum)
 
         return self.nextactions.pop(0)
