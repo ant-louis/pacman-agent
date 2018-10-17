@@ -1,7 +1,5 @@
+*.png
+*.svg
 .vscode/
-.DS_Store
-
-#Python executables
 __pycache__/
-*.pyc
 pacman_module/__pycache__/
