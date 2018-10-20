@@ -66,12 +66,12 @@ class PacmanAgent(Agent):
             #For each successor of the current node
             for next_node, next_action in current_node.generatePacmanSuccessors():
                 #Check if it was already visited
-                if hash((next_node.getPacmanPosition(), next_node.getFood())) not in visited:
+                if (hash(next_node.getPacmanPosition()), hash(next_node.getFood())) not in visited:
                     meta[next_node] = (current_node, next_action) # create metadata for these nodes
                     fringe.push(next_node)
             
             # add the current node to the visited set
-            visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
+            visited.add((hash(current_node.getPacmanPosition()), hash(current_node.getFood())))
          
     def get_action(self, state):
 

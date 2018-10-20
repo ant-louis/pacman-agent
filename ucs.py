@@ -69,18 +69,18 @@ class PacmanAgent(Agent):
             #For each successor of the current node
             for next_node, next_action in current_node.generatePacmanSuccessors():
                 #Check if it was already visited
-                if hash((next_node.getPacmanPosition(), next_node.getFood())) not in visited:
-                    #Successor wasn't visisted, we enfringe it
+                if (hash(next_node.getPacmanPosition()), hash(next_node.getFood())) not in visited:
+                    #Successor wasn't visisted, we put it on the fringe
                     meta[next_node] = (current_node, next_action) 
                     
                     #Assign priority based on the presence of food
-                    x,y = next_node.getPacmanPosition()
+                    x, y = next_node.getPacmanPosition()
                     cost = 0 if current_node.hasFood(x,y) else 1
                     fringe.update(next_node, current_cost + cost)
 
 
             #Add the current node to the visited set
-            visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
+            visited.add((hash(current_node.getPacmanPosition()), hash(current_node.getFood())))
          
     def get_action(self, state):
 
