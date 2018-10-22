@@ -16,41 +16,35 @@ class PacmanAgent(Agent):
     
     def nullHeuristic(self, state):
         """
-        A heuristic function estimates the cost from the current state to the nearest
-        goal in the provided SearchProblem.  This heuristic is trivial.
+        Implementation of a trivial heuristic.
         """
         return 0
 
     def manhattan_distance(self, current, goal):
         """
         Compute the manhattan distance between two tuples of coordinates.
+        Arguments:
+        ----------
+        - `current`: a tuple of coordinates of a starting point.
+        - `goal` : a tuple of coordinates of a goal point.
+        Return:
+        -------
+        - The manhattan distance between the starting point and the goal point.
         """
         dx = abs(current[0] - goal[0])
         dy = abs(current[1] - goal[1])
         return dx + dy
-
-    def manhattan_maximum(self, state):
-        """
-        Compute the minimum manhattan distance between the state and all foods
-        """
-        max_man = math.inf
-        x, y = state.getPacmanPosition()
-        current_food = state.getFood()
-
-        #For each position check if there is food or not
-        for i in range(current_food.width):
-            for j in range(current_food.height):
-                if current_food[i][j]:
-                    #Then compute manhattan distance from state to that food
-                    new_man = self.manhattan_distance((x,y),(i,j))
-                    #If new distance is smaller than previous minimum one, update
-                    if new_man > max_man:
-                        max_man = new_man
-        return max_man
-
+    
     def manhattan_minimum(self, state):
         """
-        Compute the minimum manhattan distance between the state and all foods
+        Given a pacman state, computes the minimum manhattan distance between
+        that state and all the left foods.
+        Arguments:
+        ----------
+        - `state`: the current game state.
+        Return:
+        -------
+        - The smallest manhattan distance from the current state to all the left foods.
         """
         min_man = math.inf
         x, y = state.getPacmanPosition()
@@ -67,14 +61,65 @@ class PacmanAgent(Agent):
                         min_man = new_man
         return min_man
 
+    def manhattan_maximum(self, state):
+        """
+        Given a pacman state, computes the maximum manhattan distance between
+        that state and all the left foods.
+        Arguments:
+        ----------
+        - `state`: the current game state.
+        Return:
+        -------
+        - The biggest manhattan distance from the current state to all the left foods.
+        """
+        max_man = 0
+        x, y = state.getPacmanPosition()
+        current_food = state.getFood()
+
+        #For each position check if there is food or not
+        for i in range(current_food.width):
+            for j in range(current_food.height):
+                if current_food[i][j]:
+                    #Then compute manhattan distance from state to that food
+                    new_man = self.manhattan_distance((x,y),(i,j))
+                    #If new distance is bigger than previous maximum one, update
+                    if new_man > max_man:
+                        max_man = new_man
+        return max_man
+    
+    def manhattan_sum(self, state):
+        """
+        Given a pacman state, computes the sum of all manhattan distances between
+        that state and all the left foods.
+        Arguments:
+        ----------
+        - `state`: the current game state.
+        Return:
+        -------
+        - The sum of all manhattan distances from the current state to all the left foods.
+        """
+        sum_man = 0
+        x, y = state.getPacmanPosition()
+        current_food = state.getFood()
+
+        #For each position check if there is food or not
+        for i in range(current_food.width):
+            for j in range(current_food.height):
+                if current_food[i][j]:
+                    #Then compute manhattan distance from state to that food
+                    new_man = self.manhattan_distance((x,y),(i,j))
+                    #Add that distance to the sum
+                    sum_man += new_man
+        return sum_man
+    
     def construct_path(self, state, meta):
         """ 
-        Produce a backtrace of the actions taken to find the food dot, using the 
-        recorded meta dictionary
+        Given a pacman state and a dictionnary, produces a backtrace of the actions 
+        taken to find the food dot, using the recorded meta dictionary.
         Arguments:
         ----------
         - `state`: the current game state. 
-        - `meta`: dictionnary containing the path information from one node to another
+        - `meta`: a dictionnary containing the path information from one node to another.
         Return:
         -------
         - A list of legal moves as defined in `game.Directions`
@@ -86,13 +131,12 @@ class PacmanAgent(Agent):
             state, action = meta[state]
             action_list.append(action)
 
-        action_list.reverse()
         return action_list
     
     def compute_tree(self, state, heuristic):
         """
-        Given a pacman state, computes a path from that state to a state
-        where pacman has eaten one food dot.
+        Given a pacman state and a heuristic function, computes a path from that 
+        state to a state where pacman has eaten all the food dots.
         Arguments:
         ----------
         - `state`: the current game state.
@@ -100,7 +144,6 @@ class PacmanAgent(Agent):
         -------
         - A list of legal moves as defined in `game.Directions`
         """
-
         fringe = PriorityQueue() # a priority queue
         visited = set() # an empty set to maintain visited nodes
 
@@ -139,7 +182,6 @@ class PacmanAgent(Agent):
             visited.add(hash((current_node.getPacmanPosition(), current_node.getFood())))
 
     def get_action(self, state):
-
         """
         Given a pacman game state, returns a legal move.
         Arguments:
@@ -150,6 +192,6 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         if not self.nextactions:
-            self.nextactions = self.compute_tree(state,self.manhattan_minimum)
+            self.nextactions = self.compute_tree(state,self.manhattan_sum)
 
-        return self.nextactions.pop(0)
+        return self.nextactions.pop()
