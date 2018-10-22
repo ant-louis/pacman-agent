@@ -16,16 +16,16 @@ class PacmanAgent(Agent):
         
     def construct_path(self, state, meta):
         """ 
-        Produce a backtrace of the actions taken to find the food dot, using the 
-        recorded meta dictionary
+        Given a pacman state and a dictionnary, produces a backtrace of the actions 
+        taken to find the food dot, using the recorded meta dictionary.
         Arguments:
         ----------
         - `state`: the current game state. 
-        - `meta`: dictionnary containing the path information from one node to another
+        - `meta`: a dictionnary containing the path information from one node to another.
         Return:
         -------
         - A list of legal moves as defined in `game.Directions`
-        """     
+        """      
         action_list = list()
         
         # Continue until you reach root meta data (i.e. (None, None))
@@ -33,16 +33,18 @@ class PacmanAgent(Agent):
             state, action = meta[state]
             action_list.append(action)
 
-        action_list.reverse()
         return action_list
 
     def compute_tree(self, state):
         """
-        Given a pacman state, computes a path from that state to a state
-        where pacman has eaten one food dot.
+        Given a pacman state, computes a path from that state to a state where 
+        pacman has eaten all the food dots.
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
+        Return:
+        -------
+        - A list of legal moves as defined in `game.Directions`
         """
         fringe = Stack() # a stack
         visited = set() # an empty set to maintain visited nodes
@@ -74,7 +76,6 @@ class PacmanAgent(Agent):
             visited.add((hash(current_node.getPacmanPosition()), hash(current_node.getFood())))
          
     def get_action(self, state):
-
         """
         Given a pacman game state, returns a legal move.
         Arguments:
@@ -87,4 +88,4 @@ class PacmanAgent(Agent):
         if not self.nextactions:
             self.nextactions = self.compute_tree(state)
 
-        return self.nextactions.pop(0)
+        return self.nextactions.pop()

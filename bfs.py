@@ -33,7 +33,6 @@ class PacmanAgent(Agent):
             state, action = meta[state]
             action_list.append(action)
 
-        action_list.reverse()
         return action_list
 
     def compute_tree(self, state):
@@ -42,7 +41,10 @@ class PacmanAgent(Agent):
         where pacman has eaten one food dot.
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
+        Return:
+        -------
+        - A list of legal moves as defined in `game.Directions`
         """
         
         fringe = deque() # a FIFO queue
@@ -53,7 +55,7 @@ class PacmanAgent(Agent):
         meta[state] = (None, None)
 
         #Append root
-        fringe.append(state) 
+        fringe.append(state)
 
         # While not empty
         while fringe: 
@@ -78,7 +80,6 @@ class PacmanAgent(Agent):
             visited.add((hash(current_node.getPacmanPosition()), hash(current_node.getFood())))
          
     def get_action(self, state):
-
         """
         Given a pacman game state, returns a legal move.
         Arguments:
@@ -91,4 +92,4 @@ class PacmanAgent(Agent):
         if not self.nextactions:
             self.nextactions = self.compute_tree(state)
 
-        return self.nextactions.pop(0)
+        return self.nextactions.pop()
