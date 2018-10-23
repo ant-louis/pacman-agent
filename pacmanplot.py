@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
-def buildPlot(title, data, ylabel, filename):
+def buildPlot(data, ylabel, filename):
     nb_maps = 3
     maps = ["small", "medium", "large"]
     algorithms = ["dfs", "bfs", "ucs", "astar"]
@@ -10,7 +10,6 @@ def buildPlot(title, data, ylabel, filename):
     
     for j in range(nb_maps):
         plt.figure()
-        plt.title(title)
         plt.ylabel(ylabel)
         plt.xlabel("Map: {}".format(maps[j]))
         plt.xticks([])
@@ -21,7 +20,7 @@ def buildPlot(title, data, ylabel, filename):
             ax.legend(["Algo {}".format(i) for i in algorithms],
                         loc='upper center', bbox_to_anchor=(0.5, -0.05),
                         fancybox=True, shadow=True, ncol=5)
-        plt.savefig("{}_{}.svg".format(filename,maps[j]), format="svg")
+        plt.savefig("{}_{}.svg".format(filename,maps[j]), format="svg", bbox_inches='tight',pad_inches=0.0)
         plt.show()
 
 
@@ -60,6 +59,6 @@ total_expanded = [
     large_layout_expanded
 ]
 
-buildPlot("Running times of different search algorithms", run_times, "Running time (s)", "run_times")
-buildPlot("Total number of expanded nodes for different search algorithms", total_expanded, "Number of expanded nodes", "total_expanded")
-buildPlot("Total score for different search algorithms", total_score, "Total score", "total_score")
+buildPlot(run_times, "Running time (s)", "run_times")
+buildPlot(total_expanded, "Number of expanded nodes", "total_expanded")
+buildPlot(total_score, "Total score", "total_score")
