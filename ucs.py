@@ -12,12 +12,14 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-        self.nextactions = list() #List to contain the path to the next food item
-        
+        # List to contain the final list of actions
+        self.nextactions = list() 
+
     def construct_path(self, state, meta):
         """ 
-        Given a pacman state and a dictionnary, produces a backtrace of the actions 
-        taken to find the food dot, using the recorded meta dictionary.
+        Given a pacman state and a dictionnary, produces a backtrace 
+        of the actions taken to find the food dot, using the recorded
+        meta dictionary.
         Arguments:
         ----------
         - `state`: the current game state. 
@@ -27,7 +29,7 @@ class PacmanAgent(Agent):
         - A list of legal moves as defined in `game.Directions`
         """       
         action_list = list()
-        
+
         # Continue until you reach root meta data (i.e. (None, None))
         while meta[state][0] is not None:
             state, action = meta[state]
@@ -49,7 +51,8 @@ class PacmanAgent(Agent):
         fringe = PriorityQueue() # a priority queue
         visited = set() # an empty set to maintain visited nodes
 
-        # a dictionary to maintain path information : key -> (parent state, action to reach child)
+        # a dictionary to maintain path information :
+        # key -> (parent state, action to reach child)
         meta = dict()
         meta[state] = (None, None)
 
@@ -58,19 +61,21 @@ class PacmanAgent(Agent):
         
         # While not empty
         while not fringe.isEmpty(): 
-            #Pick one available state
+            # Pick one available state
             current_cost, current_node = fringe.pop()
 
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
+            successors = current_node.generatePacmanSuccessors()
+            # For each successor of the current node
+            for next_node, next_action in successors:
+                # Check if it was already visited
+                if (hash(next_node.getPacmanPosition()), 
+                    hash(next_node.getFood())) not in visited:
 
-            #For each successor of the current node
-            for next_node, next_action in current_node.generatePacmanSuccessors():
-                #Check if it was already visited
-                if (hash(next_node.getPacmanPosition()), hash(next_node.getFood())) not in visited:
                     #Successor wasn't visisted, we put it on the fringe
                     meta[next_node] = (current_node, next_action) 
-                    
+
                     #Assign priority based on the presence of food
                     x, y = next_node.getPacmanPosition()
                     cost = 0 if current_node.hasFood(x,y) else 1
