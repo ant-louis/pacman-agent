@@ -16,13 +16,13 @@ class PacmanAgent(Agent):
 
     def construct_path(self, state, meta):
         """
-        Given a pacman state and a dictionnary, produces a backtrace of 
+        Given a pacman state and a dictionnary, produces a backtrace of
         the actions taken to find the food dot, using the recorded meta
         dictionary.
         Arguments:
         ----------
-        - `state`: the current game state. 
-        - `meta`: dictionnary containing the path information from one node 
+        - `state`: the current game state.
+        - `meta`: dictionnary containing the path information from one node
         to another.
         Return:
         -------
@@ -52,7 +52,7 @@ class PacmanAgent(Agent):
         fringe = deque()  # a FIFO queue
         visited = set()  # an empty set to maintain visited nodes
 
-        # a dictionary to maintain path information : 
+        # a dictionary to maintain path information :
         # key -> (parent state, action to reach child)
         meta = dict()
         meta[state] = (None, None)
@@ -61,7 +61,7 @@ class PacmanAgent(Agent):
         fringe.append(state)
 
         # While not empty
-        while fringe: 
+        while fringe:
             # Pick one available state
             current_node = fringe.popleft()
 
@@ -69,12 +69,20 @@ class PacmanAgent(Agent):
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
-           successors = current_node.generatePacmanSuccessors()
+            # Get info on current node
+            successors = current_node.generatePacmanSuccessors()
+            curr_pos = current_node.getPacmanPosition()
+            curr_food = current_node.getFood()
+
             # For each successor of the current node
             for next_node, next_action in successors:
+
+                # Get info on successor
+                next_pos = next_node.getPacmanPosition()
+                next_food = next_node.getFood()
+
                 # Check if it was already visited
-                if (hash(next_node.getPacmanPosition()), 
-                    hash(next_node.getFood())) in visited:
+                if (hash(next_pos), hash(next_food)) in visited:
                     continue
                 # Successor wasn't visisted, check if it's on the fringe
                 if next_node not in fringe:
@@ -83,8 +91,7 @@ class PacmanAgent(Agent):
                     fringe.append(next_node)
 
             # Add the current node to the visited set
-            visited.add((hash(current_node.getPacmanPosition()), 
-                            hash(current_node.getFood())))
+            visited.add((hash(curr_pos), hash(curr_food)))
 
     def get_action(self, state):
         """

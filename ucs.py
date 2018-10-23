@@ -16,13 +16,13 @@ class PacmanAgent(Agent):
 
     def construct_path(self, state, meta):
         """
-        Given a pacman state and a dictionnary, produces a backtrace 
+        Given a pacman state and a dictionnary, produces a backtrace
         of the actions taken to find the food dot, using the recorded
         meta dictionary.
         Arguments:
         ----------
-        - `state`: the current game state. 
-        - `meta`: a dictionnary containing the path information from one 
+        - `state`: the current game state.
+        - `meta`: a dictionnary containing the path information from one
         node to another.
         Return:
         -------
@@ -57,10 +57,10 @@ class PacmanAgent(Agent):
         meta[state] = (None, None)
 
         # Append root
-        fringe.update(state,1)
-        
+        fringe.update(state, 1)
+
         # While not empty
-        while not fringe.isEmpty(): 
+        while not fringe.isEmpty():
             # Pick one available state
             current_cost, current_node = fringe.pop()
 
@@ -68,26 +68,33 @@ class PacmanAgent(Agent):
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
+            # Get info on current node
             successors = current_node.generatePacmanSuccessors()
+            curr_pos = current_node.getPacmanPosition()
+            curr_food = current_node.getFood()
+
             # For each successor of the current node
             for next_node, next_action in successors:
+
+                # Get info on successor
+                next_pos = next_node.getPacmanPosition()
+                next_food = next_node.getFood()
+
                 # Check if it was already visited
-                if (hash(next_node.getPacmanPosition()), 
-                    hash(next_node.getFood())) not in visited:
+                if (hash(next_pos), hash(next_food)) not in visited:
 
                     # If not, update meta
-                    meta[next_node] = (current_node, next_action) 
+                    meta[next_node] = (current_node, next_action)
 
                     # Assign priority based on the presence of food
                     x, y = next_node.getPacmanPosition()
-                    cost = 0 if current_node.hasFood(x,y) else 1
+                    cost = 0 if current_node.hasFood(x, y) else 1
 
                     # Put the successor on the fringe
                     fringe.update(next_node, current_cost + cost)
 
             # Add the current node to the visited set
-            visited.add((hash(current_node.getPacmanPosition()), 
-                            hash(current_node.getFood())))
+            visited.add((hash(curr_pos), hash(curr_food)))
 
     def get_action(self, state):
         """

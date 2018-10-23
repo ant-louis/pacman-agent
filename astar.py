@@ -1,7 +1,7 @@
 from pacman_module.game import Agent
 from pacman_module.pacman import Directions
 from pacman_module.util import PriorityQueue
-import math
+
 
 class PacmanAgent(Agent):
 
@@ -13,7 +13,7 @@ class PacmanAgent(Agent):
         """
         self.args = args
         self.nextactions = list()  # List to contain the final list of actions
-    
+
     def nullHeuristic(self, state):
         """
         Implementation of a trivial heuristic.
@@ -29,7 +29,7 @@ class PacmanAgent(Agent):
         - `goal` : a tuple of coordinates of a goal point.
         Return:
         -------
-        - The manhattan distance between the starting point and the goal 
+        - The manhattan distance between the starting point and the goal
         point.
         """
         dx = abs(current[0] - goal[0])
@@ -45,7 +45,7 @@ class PacmanAgent(Agent):
         - `state`: the current game state.
         Return:
         -------
-        - The biggest manhattan distance from the current state to all the 
+        - The biggest manhattan distance from the current state to all the
         left foods.
         """
         max_man = 0
@@ -57,22 +57,22 @@ class PacmanAgent(Agent):
             for j in range(current_food.height):
                 if current_food[i][j]:
                     # Then compute manhattan distance from state to that food
-                    new_man = self.manhattan_distance((x,y),(i,j))
-                    # If new distance is bigger than previous maximum one, update
+                    new_man = self.manhattan_distance((x, y), (i, j))
+                    # If new distance is bigger than maximum one, update
                     if new_man > max_man:
                         max_man = new_man
         return max_man
 
     def manhattan_sum(self, state):
         """
-        Given a pacman state, computes the sum of all manhattan distances 
+        Given a pacman state, computes the sum of all manhattan distances
         between that state and all the leftover foods.
         Arguments:
         ----------
         - `state`: the current game state.
         Return:
         -------
-        - The sum of all manhattan distances from the current state to all 
+        - The sum of all manhattan distances from the current state to all
         the left foods.
         """
         sum_man = 0
@@ -84,20 +84,20 @@ class PacmanAgent(Agent):
             for j in range(current_food.height):
                 if current_food[i][j]:
                     # Then compute manhattan distance from state to that food
-                    new_man = self.manhattan_distance((x,y),(i,j))
+                    new_man = self.manhattan_distance((x, y), (i, j))
                     # Add that distance to the sum
                     sum_man += new_man
         return sum_man
 
     def construct_path(self, state, meta):
         """
-        Given a pacman state and a dictionnary, produces a backtrace of 
-        the actions taken to find the food dot, using the recorded meta 
+        Given a pacman state and a dictionnary, produces a backtrace of
+        the actions taken to find the food dot, using the recorded meta
         dictionary.
         Arguments:
         ----------
-        - `state`: the current game state. 
-        - `meta`: a dictionnary containing the path information from one 
+        - `state`: the current game state.
+        - `meta`: a dictionnary containing the path information from one
         node to another.
         Return:
         -------
@@ -114,8 +114,8 @@ class PacmanAgent(Agent):
 
     def compute_tree(self, state, heuristic):
         """
-        Given a pacman state and a heuristic function, computes a path 
-        from that state to a state where pacman has eaten all the food 
+        Given a pacman state and a heuristic function, computes a path
+        from that state to a state where pacman has eaten all the food
         dots.
         Arguments:
         ----------
@@ -127,35 +127,44 @@ class PacmanAgent(Agent):
         fringe = PriorityQueue()  # a priority queue
         visited = set()  # an empty set to maintain visited nodes
 
-        # a dictionary to maintain path information : 
+        # a dictionary to maintain path information :
         # key -> (parent state, action to reach child)
         meta = dict()
         meta[state] = (None, None)
 
         # Append root
-        fringe.update(state,1)
+        fringe.update(state, 1)
 
         # While not empty
-        while not fringe.isEmpty(): 
+        while not fringe.isEmpty():
             # Pick one available state
             current_cost, current_node = fringe.pop()
 
+            # If all food dots found, stop and compute a path
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
+            # Get info on current node
+            successors = current_node.generatePacmanSuccessors()
+            curr_pos = current_node.getPacmanPosition()
+            curr_food = current_node.getFood()
+
             # For each successor of the current node
-            for next_node, 
-                next_action in current_node.generatePacmanSuccessors():
+            for next_node, next_action in successors:
+
+                # Get info on successor
+                next_pos = next_node.getPacmanPosition()
+                next_food = next_node.getFood()
+
                 # Check if it was already visited
-                if (hash(next_node.getPacmanPosition()), 
-                    hash(next_node.getFood())) not in visited:
+                if (hash(next_pos), hash(next_food)) not in visited:
 
                     # If not, update meta
-                    meta[next_node] = (current_node, next_action) 
+                    meta[next_node] = (current_node, next_action)
 
                     # Assign priority based on the presence of food
-                    x,y = next_node.getPacmanPosition()
-                    cost = 0 if current_node.hasFood(x,y) else 1
+                    x, y = next_node.getPacmanPosition()
+                    cost = 0 if current_node.hasFood(x, y) else 1
                     new_cost = current_cost + cost
 
                     # Assign priority f(n) = g(n) + h(n) and update node
@@ -164,9 +173,8 @@ class PacmanAgent(Agent):
                     # Put the successor on the fringe
                     fringe.update(next_node, priority)
 
-            #Add the current node to the visited set
-            visited.add((hash(current_node.getPacmanPosition()), 
-                            hash(current_node.getFood())))
+            # Add the current node to the visited set
+            visited.add((hash(curr_pos), hash(curr_food)))
 
     def get_action(self, state):
         """
@@ -179,6 +187,6 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         if not self.nextactions:
-            self.nextactions = self.compute_tree(state,self.manhattan_sum)
+            self.nextactions = self.compute_tree(state, self.manhattan_sum)
 
         return self.nextactions.pop()
