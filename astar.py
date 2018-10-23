@@ -149,7 +149,8 @@ class PacmanAgent(Agent):
                 # Check if it was already visited
                 if (hash(next_node.getPacmanPosition()), 
                     hash(next_node.getFood())) not in visited:
-                    # Successor wasn't visisted, we enfringe it
+
+                    # If not, update meta
                     meta[next_node] = (current_node, next_action) 
 
                     # Assign priority based on the presence of food
@@ -159,6 +160,8 @@ class PacmanAgent(Agent):
 
                     # Assign priority f(n) = g(n) + h(n) and update node
                     priority = new_cost + heuristic(current_node)
+
+                    # Put the successor on the fringe
                     fringe.update(next_node, priority)
 
             #Add the current node to the visited set

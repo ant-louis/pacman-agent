@@ -65,20 +65,21 @@ class PacmanAgent(Agent):
             # Pick one available state
             current_node = fringe.popleft()
 
-            # We found one food dot so we stop and compute a path.
+            # If all food dots found, stop and compute a path
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
-           # For each successor of the current node
-            for next_node, 
-                next_action in current_node.generatePacmanSuccessors():
+           successors = current_node.generatePacmanSuccessors()
+            # For each successor of the current node
+            for next_node, next_action in successors:
                 # Check if it was already visited
                 if (hash(next_node.getPacmanPosition()), 
                     hash(next_node.getFood())) in visited:
                     continue
-                # Successor wasn't visisted, we put in on the fringe
+                # Successor wasn't visisted, check if it's on the fringe
                 if next_node not in fringe:
-                    meta[next_node] = (current_node, next_action) # create metadata for these nodes
+                    # If not, update meta and put the successor on the fringe
+                    meta[next_node] = (current_node, next_action)
                     fringe.append(next_node)
 
             # Add the current node to the visited set

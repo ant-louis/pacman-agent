@@ -12,22 +12,22 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-        # List to contain the final list of actions
-        self.nextactions = list() 
+        self.nextactions = list()  # List to contain the final list of actions
 
     def construct_path(self, state, meta):
-        """ 
+        """
         Given a pacman state and a dictionnary, produces a backtrace 
         of the actions taken to find the food dot, using the recorded
         meta dictionary.
         Arguments:
         ----------
         - `state`: the current game state. 
-        - `meta`: a dictionnary containing the path information from one node to another.
+        - `meta`: a dictionnary containing the path information from one 
+        node to another.
         Return:
         -------
         - A list of legal moves as defined in `game.Directions`
-        """       
+        """
         action_list = list()
 
         # Continue until you reach root meta data (i.e. (None, None))
@@ -39,8 +39,8 @@ class PacmanAgent(Agent):
 
     def compute_tree(self, state):
         """
-        Given a pacman state, computes a path from that state to a state where 
-        pacman has eaten all the food dots.
+        Given a pacman state, computes a path from that state to a state
+        where pacman has eaten all the food dots.
         Arguments:
         ----------
         - `state`: the current game state.
@@ -48,15 +48,15 @@ class PacmanAgent(Agent):
         -------
         - A list of legal moves as defined in `game.Directions`
         """
-        fringe = PriorityQueue() # a priority queue
-        visited = set() # an empty set to maintain visited nodes
+        fringe = PriorityQueue()  # a priority queue
+        visited = set()  # an empty set to maintain visited nodes
 
         # a dictionary to maintain path information :
         # key -> (parent state, action to reach child)
         meta = dict()
         meta[state] = (None, None)
 
-        #Append root
+        # Append root
         fringe.update(state,1)
         
         # While not empty
@@ -64,8 +64,10 @@ class PacmanAgent(Agent):
             # Pick one available state
             current_cost, current_node = fringe.pop()
 
+            # If all food dots found, stop and compute a path
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
+
             successors = current_node.generatePacmanSuccessors()
             # For each successor of the current node
             for next_node, next_action in successors:
@@ -73,17 +75,20 @@ class PacmanAgent(Agent):
                 if (hash(next_node.getPacmanPosition()), 
                     hash(next_node.getFood())) not in visited:
 
-                    #Successor wasn't visisted, we put it on the fringe
+                    # If not, update meta
                     meta[next_node] = (current_node, next_action) 
 
-                    #Assign priority based on the presence of food
+                    # Assign priority based on the presence of food
                     x, y = next_node.getPacmanPosition()
                     cost = 0 if current_node.hasFood(x,y) else 1
+
+                    # Put the successor on the fringe
                     fringe.update(next_node, current_cost + cost)
 
-            #Add the current node to the visited set
-            visited.add((hash(current_node.getPacmanPosition()), hash(current_node.getFood())))
-         
+            # Add the current node to the visited set
+            visited.add((hash(current_node.getPacmanPosition()), 
+                            hash(current_node.getFood())))
+
     def get_action(self, state):
         """
         Given a pacman game state, returns a legal move.
