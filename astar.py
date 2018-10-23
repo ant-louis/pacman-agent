@@ -34,37 +34,11 @@ class PacmanAgent(Agent):
         dx = abs(current[0] - goal[0])
         dy = abs(current[1] - goal[1])
         return dx + dy
-    
-    def manhattan_minimum(self, state):
-        """
-        Given a pacman state, computes the minimum manhattan distance between
-        that state and all the left foods.
-        Arguments:
-        ----------
-        - `state`: the current game state.
-        Return:
-        -------
-        - The smallest manhattan distance from the current state to all the left foods.
-        """
-        min_man = math.inf
-        x, y = state.getPacmanPosition()
-        current_food = state.getFood()
-
-        #For each position check if there is food or not
-        for i in range(current_food.width):
-            for j in range(current_food.height):
-                if current_food[i][j]:
-                    #Then compute manhattan distance from state to that food
-                    new_man = self.manhattan_distance((x,y),(i,j))
-                    #If new distance is smaller than previous minimum one, update
-                    if new_man < min_man:
-                        min_man = new_man
-        return min_man
 
     def manhattan_maximum(self, state):
         """
         Given a pacman state, computes the maximum manhattan distance between
-        that state and all the left foods.
+        that state and all the leftover foods.
         Arguments:
         ----------
         - `state`: the current game state.
@@ -90,7 +64,7 @@ class PacmanAgent(Agent):
     def manhattan_sum(self, state):
         """
         Given a pacman state, computes the sum of all manhattan distances between
-        that state and all the left foods.
+        that state and all the leftover foods.
         Arguments:
         ----------
         - `state`: the current game state.
