@@ -3,7 +3,7 @@ import numpy as np
 def buildPlot(data, ylabel, filename):
     nb_maps = 3
     maps = ["small", "medium", "large"]
-    algorithms = ["dfs", "bfs", "ucs", "astar"]
+    algorithms = ["DFS", "BFS", "UCS", "A*"]
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
     nb_algo = 4
     bar_width = .15
@@ -17,7 +17,7 @@ def buildPlot(data, ylabel, filename):
 
         for i in range(nb_algo):
             plt.bar((0.05+ bar_width)*i, data[j][i], width=bar_width,color=colors[i])
-            ax.legend(["Algo {}".format(i) for i in algorithms],
+            ax.legend(["{}".format(i) for i in algorithms],
                         loc='upper center', bbox_to_anchor=(0.5, -0.05),
                         fancybox=True, shadow=True, ncol=5)
         plt.savefig("{}_{}.svg".format(filename,maps[j]), format="svg", bbox_inches='tight',pad_inches=0.0)
