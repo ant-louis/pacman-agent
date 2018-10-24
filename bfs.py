@@ -12,22 +12,24 @@ class PacmanAgent(Agent):
         - `args`: Namespace of arguments from command-line prompt.
         """
         self.args = args
-        self.nextactions = list() #List to contain the final path to the goal
-        
+        self.nextactions = list()  # List to contain the final list of actions
+
     def construct_path(self, state, meta):
-        """ 
-        Produce a backtrace of the actions taken to find the food dot, using the 
-        recorded meta dictionary
+        """
+        Given a pacman state and a dictionnary, produces a backtrace of
+        the actions taken to find the food dot, using the recorded meta
+        dictionary.
         Arguments:
         ----------
-        - `state`: the current game state. 
-        - `meta`: dictionnary containing the path information from one node to another
+        - `state`: the current game state.
+        - `meta`: dictionnary containing the path information from one node
+        to another.
         Return:
         -------
         - A list of legal moves as defined in `game.Directions`
-        """     
+        """
         action_list = list()
-        
+
         # Continue until you reach root meta data (i.e. (None, None))
         while meta[state][0] is not None:
             state, action = meta[state]
@@ -46,39 +48,51 @@ class PacmanAgent(Agent):
         -------
         - A list of legal moves as defined in `game.Directions`
         """
-        
-        fringe = deque() # a FIFO queue
-        visited = set() # an empty set to maintain visited nodes
 
-        # a dictionary to maintain path information : key -> (parent state, action to reach child)
+        fringe = deque()  # a FIFO queue
+        visited = set()  # an empty set to maintain visited nodes
+
+        # a dictionary to maintain path information :
+        # key -> (parent state, action to reach child)
         meta = dict()
         meta[state] = (None, None)
 
-        #Append root
+        # Append root
         fringe.append(state)
 
         # While not empty
-        while fringe: 
-            #Pick one available state
+        while fringe:
+            # Pick one available state
             current_node = fringe.popleft()
 
-            # We found one food dot so we stop and compute a path.
+            # If all food dots found, stop and compute a path
             if current_node.isWin():
                 return self.construct_path(current_node, meta)
 
-           #For each successor of the current node
-            for next_node, next_action in current_node.generatePacmanSuccessors():
-                #Check if it was already visited
-                if (hash(next_node.getPacmanPosition()), hash(next_node.getFood())) in visited:
+            # Get info on current node
+            successors = current_node.generatePacmanSuccessors()
+            curr_pos = current_node.getPacmanPosition()
+            curr_food = current_node.getFood()
+
+            # For each successor of the current node
+            for next_node, next_action in successors:
+
+                # Get info on successor
+                next_pos = next_node.getPacmanPosition()
+                next_food = next_node.getFood()
+
+                # Check if it was already visited
+                if (hash(next_pos), hash(next_food)) in visited:
                     continue
-                #Successor wasn't visisted, we put in on the fringe
+                # Successor wasn't visisted, check if it's on the fringe
                 if next_node not in fringe:
-                    meta[next_node] = (current_node, next_action) # create metadata for these nodes
+                    # If not, update meta and put the successor on the fringe
+                    meta[next_node] = (current_node, next_action)
                     fringe.append(next_node)
-            
-            # add the current node to the visited set
-            visited.add((hash(current_node.getPacmanPosition()), hash(current_node.getFood())))
-         
+
+            # Add the current node to the visited set
+            visited.add((hash(curr_pos), hash(curr_food)))
+
     def get_action(self, state):
         """
         Given a pacman game state, returns a legal move.
