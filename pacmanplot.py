@@ -32,7 +32,7 @@ small_layout_expanded = [15, 15, 15, 14]
 
 #[DFS BFS UCS A*]
 medium_layout_score = [414, 570, 570, 570]
-medium_layout_time = [0.0749, 12.752, 8.941, 8.652]
+medium_layout_time = [0.0749, 9.905, 8.941, 8.652]
 medium_layout_expanded = [361, 16688, 12517, 11293]
 
 
