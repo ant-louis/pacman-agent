@@ -14,12 +14,6 @@ class PacmanAgent(Agent):
         self.args = args
         self.nextactions = list()  # List to contain the final list of actions
 
-    def nullHeuristic(self, state):
-        """
-        Implementation of a trivial heuristic.
-        """
-        return 0
-
     def manhattan_distance(self, current, goal):
         """
         Compute the manhattan distance between two tuples of coordinates.
@@ -62,32 +56,6 @@ class PacmanAgent(Agent):
                     if new_man > max_man:
                         max_man = new_man
         return max_man
-
-    def manhattan_sum(self, state):
-        """
-        Given a pacman state, computes the sum of all manhattan distances
-        between that state and all the leftover foods.
-        Arguments:
-        ----------
-        - `state`: the current game state.
-        Return:
-        -------
-        - The sum of all manhattan distances from the current state to all
-        the left foods.
-        """
-        sum_man = 0
-        x, y = state.getPacmanPosition()
-        current_food = state.getFood()
-
-        # For each position check if there is food or not
-        for i in range(current_food.width):
-            for j in range(current_food.height):
-                if current_food[i][j]:
-                    # Then compute manhattan distance from state to that food
-                    new_man = self.manhattan_distance((x, y), (i, j))
-                    # Add that distance to the sum
-                    sum_man += new_man
-        return sum_man
 
     def construct_path(self, state, meta):
         """
@@ -187,6 +155,6 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         if not self.nextactions:
-            self.nextactions = self.compute_tree(state, self.manhattan_sum)
+            self.nextactions = self.compute_tree(state, self.manhattan_maximum)
 
         return self.nextactions.pop()

@@ -26,20 +26,20 @@ def buildPlot(data, ylabel, filename):
 
 #[DFS BFS UCS A*]
 small_layout_score = [500, 502, 502, 502]
-small_layout_time = [0.00146, 0.00172, 0.00315, 0.00190]
+small_layout_time = [0.00146, 0.00172, 0.00315, 0.00207]
 small_layout_expanded = [15, 16, 16, 16]
 
 
 #[DFS BFS UCS A*]
 medium_layout_score = [414, 570, 570, 570]
-medium_layout_time = [0.0512, 7.695, 8.245, 4.725]
-medium_layout_expanded = [362, 17432, 13241, 8808]
+medium_layout_time = [0.0512, 7.695, 8.245, 9.626]
+medium_layout_expanded = [362, 17432, 13241, 12776]
 
 
 #[DFS BFS UCS A*]
 large_layout_score = [319, 434, 434, 434]
-large_layout_time = [0.111, 0.619, 0.786, 0.470]
-large_layout_expanded = [378, 2134, 2065, 1014]
+large_layout_time = [0.111, 0.619, 0.786, 0.666]
+large_layout_expanded = [378, 2134, 2065, 1329]
 
 total_score = [
     small_layout_score,
