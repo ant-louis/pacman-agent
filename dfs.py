@@ -4,6 +4,10 @@ from pacman_module.util import Stack
 
 
 class PacmanAgent(Agent):
+    """
+    This PacmanAgent class solves the Pacman game using the Depth
+    First Search algorithm 
+    """
 
     def __init__(self, args):
         """
