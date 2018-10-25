@@ -4,7 +4,10 @@ from collections import deque
 
 
 class PacmanAgent(Agent):
-
+    """
+    This PacmanAgent class solves the Pacman game using the Breadth
+    First Search algorithm 
+    """
     def __init__(self, args):
         """
         Arguments:

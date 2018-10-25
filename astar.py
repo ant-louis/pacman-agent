@@ -5,6 +5,15 @@ from pacman_module.util import PriorityQueue
 
 
 class PacmanAgent(Agent):
+    """
+    This PacmanAgent class solves the Pacman game using the A*
+    Search algorithm.
+    Three heuristics were implemented
+    - nullHeuristic, which behaves like a Breadth First Search algorithm.
+    - manhattan_maximum, which computes for each position the maximum 
+      manhattan distance to all the leftover foods
+
+    """
 
     def __init__(self, args):
         """

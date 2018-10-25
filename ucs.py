@@ -4,7 +4,11 @@ from pacman_module.util import PriorityQueue
 
 
 class PacmanAgent(Agent):
-
+    """
+    This PacmanAgent class solves the Pacman game using the Universal
+    Cost Search algorithm where we assigned a weight of 1 of each empty
+    node and a cost of 0 for a node with food.
+    """
     def __init__(self, args):
         """
         Arguments:
