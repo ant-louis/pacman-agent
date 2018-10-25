@@ -69,32 +69,33 @@ class PacmanAgent(Agent):
                 return self.construct_path(current_node, meta)
 
             # Get info on current node
-            successors = current_node.generatePacmanSuccessors()
             curr_pos = current_node.getPacmanPosition()
             curr_food = current_node.getFood()
 
-            # For each successor of the current node
-            for next_node, next_action in successors:
+            if (hash(curr_pos), hash(curr_food)) not in visited:
+                # Add the current node to the visited set
+                visited.add((hash(curr_pos), hash(curr_food)))
 
-                # Get info on successor
-                next_pos = next_node.getPacmanPosition()
-                next_food = next_node.getFood()
+                # For each successor of the current node
+                successors = current_node.generatePacmanSuccessors()
+                for next_node, next_action in successors:
 
-                # Check if it was already visited
-                if (hash(next_pos), hash(next_food)) not in visited:
+                    # Get info on successor
+                    next_pos = next_node.getPacmanPosition()
+                    next_food = next_node.getFood()
 
-                    # If not, update meta
-                    meta[next_node] = (current_node, next_action)
+                    # Check if it was already visited
+                    if (hash(next_pos), hash(next_food)) not in visited:
 
-                    # Assign priority based on the presence of food
-                    x, y = next_node.getPacmanPosition()
-                    cost = 0 if current_node.hasFood(x, y) else 1
+                        # If not, update meta
+                        meta[next_node] = (current_node, next_action)
 
-                    # Put the successor on the fringe
-                    fringe.update(next_node, current_cost + cost)
+                        # Assign priority based on the presence of food
+                        x, y = next_node.getPacmanPosition()
+                        cost = 0 if current_node.hasFood(x, y) else 1
 
-            # Add the current node to the visited set
-            visited.add((hash(curr_pos), hash(curr_food)))
+                        # Put the successor on the fringe
+                        fringe.update(next_node, current_cost + cost)
 
     def get_action(self, state):
         """

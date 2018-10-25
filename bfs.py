@@ -70,28 +70,28 @@ class PacmanAgent(Agent):
                 return self.construct_path(current_node, meta)
 
             # Get info on current node
-            successors = current_node.generatePacmanSuccessors()
             curr_pos = current_node.getPacmanPosition()
             curr_food = current_node.getFood()
 
-            # For each successor of the current node
-            for next_node, next_action in successors:
+            if (hash(curr_pos), hash(curr_food)) not in visited:
+                # Add the current node to the visited set
+                visited.add((hash(curr_pos), hash(curr_food)))
 
-                # Get info on successor
-                next_pos = next_node.getPacmanPosition()
-                next_food = next_node.getFood()
+                # For each successor of the current node
+                successors = current_node.generatePacmanSuccessors()
+                for next_node, next_action in successors:
+                    # Get info on successor
+                    next_pos = next_node.getPacmanPosition()
+                    next_food = next_node.getFood()
 
-                # Check if it was already visited
-                if (hash(next_pos), hash(next_food)) in visited:
-                    continue
-                # Successor wasn't visisted, check if it's on the fringe
-                if next_node not in fringe:
-                    # If not, update meta and put the successor on the fringe
-                    meta[next_node] = (current_node, next_action)
-                    fringe.append(next_node)
-
-            # Add the current node to the visited set
-            visited.add((hash(curr_pos), hash(curr_food)))
+                    # Check if it was already visited
+                    if (hash(next_pos), hash(next_food)) in visited:
+                        continue
+                    # Successor wasn't visisted, check if it's on the fringe
+                    if next_node not in fringe:
+                        # If not, update meta and put the successor on the fringe
+                        meta[next_node] = (current_node, next_action)
+                        fringe.append(next_node)
 
     def get_action(self, state):
         """
