@@ -15,7 +15,7 @@ class PacmanAgent(Agent):
         self.nb_ghosts = 0
         self.depth = 5
     
-    def manhattan_distance(self,xy1, xy2):
+    def manhattan_distance(self, xy1, xy2):
         """Returns the Manhattan distance between points.
         Arguments:
         ----------
