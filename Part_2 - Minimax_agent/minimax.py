@@ -14,6 +14,7 @@ class PacmanAgent(Agent):
         self.args = args
         self.nb_ghosts = 0
         self.depth = 5
+        self.visited = set()
     
     def manhattan_distance(self,xy1, xy2):
         """Returns the Manhattan distance between points.
@@ -103,8 +104,29 @@ class PacmanAgent(Agent):
         values = list()
         actions = list()
 
+        # Get info on current node
+        curr_pos = state.getPacmanPosition()
+        curr_food = state.getFood()
+        curr_ghost_pos = state.getGhostPositions()
+        
+        curr_info = tuple([hash(curr_pos), hash(curr_food), tuple(curr_ghost_pos)])
+        if curr_info not in self.visited:
+            # Add the current node to the visited set
+            self.visited.add(curr_info)
+
+        # For each successor of the current node            
         pac_successors = state.generatePacmanSuccessors()
         for next_state, next_action in pac_successors:
+            # Get info on successor
+            next_pos = next_state.getPacmanPosition()
+            next_food = next_state.getFood()
+            next_ghost_pos = next_state.getGhostPositions()
+            
+            next_info = tuple([hash(next_pos), hash(next_food), tuple(next_ghost_pos)])
+            # Check if it was already visited
+            if next_info in self.visited:
+                continue
+
             value = self.min_value(next_state, depth, nb_ghosts)
             values.append(value)
             actions.append(next_action)
