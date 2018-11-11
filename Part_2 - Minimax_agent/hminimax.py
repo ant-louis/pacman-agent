@@ -43,7 +43,7 @@ class PacmanAgent(Agent):
         ----------
         The custom utility value at a given state.
         """
-        return self.safest_evaluation(state)  # Returns the utility value
+        return self.safest_evaluation(state)  
     
     #WORKS BETTER THAN SCORE
     def safest_evaluation(self, state):
@@ -64,8 +64,8 @@ class PacmanAgent(Agent):
         Returns:
         ----------
         The custom utility value at a given state.
-        current_score = state.getScore()
         """
+        current_score = state.getScore()
 
         # If pacman wins the game
         if state.isWin():
@@ -83,7 +83,7 @@ class PacmanAgent(Agent):
         closest_ghost = min(ghost_dist)
         
         # Get the number of foods left
-        nb_foods_left = len(food_list)
+        nb_foods_left = state.getNumFood()
 
         # Compute score
 
@@ -186,4 +186,5 @@ class PacmanAgent(Agent):
 
         # Compute next move
         next_move = self.hminimax_decision(state, self.depth, self.nb_ghosts)
+        
         return next_move
