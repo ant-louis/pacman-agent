@@ -5,6 +5,7 @@ import math
 
 
 class PacmanAgent(Agent):
+
     def __init__(self, args):
         """
         Arguments:
@@ -14,24 +15,35 @@ class PacmanAgent(Agent):
         self.args = args
         self.nb_ghosts = 0
         self.depth = 5
-    
-    def score_evaluation(self, state):
-        """Returns the score of the state.
+
+    def manhattan_distance(self,xy1, xy2):
+        """Returns the Manhattan distance between points.
+        Arguments:
+        ----------
+        - `xy1`: the first point.
+        - `xy2`: the second point.
+
+        Returns:
+        ----------
+        The Manhattan distance between points xy1 and xy2.
+        """
+        return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+    def cutoff_test(self, state, depth):
+        return state.isWin() or state.isLose() or depth == 0
+
+
+    def eval_state(self, state):
+        """Returns a custum utility value of the state.
         Arguments:
         ----------
         - `state`: the current game state.
 
         Returns:
         ----------
-        The score of the given state.
+        The custom utility value at a given state.
         """
-        return state.getScore()
-
-    def cutoff_test(self, state, depth):
-        return state.isWin() or state.isLose() or depth == 0
-
-    def eval_state(self, state):
-        return self.closestfood_evaluation(state)  # Returns the utility value
+        return self.safest_evaluation(state)  # Returns the utility value
     
     #WORKS BETTER THAN SCORE
     def safest_evaluation(self, state):
@@ -52,17 +64,8 @@ class PacmanAgent(Agent):
         Returns:
         ----------
         The custom utility value at a given state.
-        """
-        score = 0
-        ghost_dist = 0
-        closest_food = math.inf
-        closest_ghost = math.inf
-        nb_foods_left = math.inf
-
-        food_list = state.getFood().asList()
-        pacman_pos = state.getPacmanPosition()
-        ghost_list = state.getGhostPositions()
         current_score = state.getScore()
+        """
 
         # If pacman wins the game
         if state.isWin():
@@ -83,6 +86,7 @@ class PacmanAgent(Agent):
         nb_foods_left = len(food_list)
 
         # Compute score
+
         score = 1 * current_score + \
                 2 * max(closest_ghost, 4) + \
                 -1.5 * closest_food + \
@@ -91,23 +95,7 @@ class PacmanAgent(Agent):
         return score
 
 
-    def manhattan_distance(self,xy1, xy2):
-        """Returns the Manhattan distance between points.
-        Arguments:
-        ----------
-        - `xy1`: the first point.
-        - `xy2`: the second point.
-
-        Returns:
-        ----------
-        The Manhattan distance between points xy1 and xy2.
-        """
-        return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-    
-            
-
-
-    def alphabeta_decision(self, state, depth, nb_ghosts):
+    def hminimax_decision(self, state, depth, nb_ghosts):
         """Returns the best legal action according to the H-minimax algorithm.
         Arguments:
         ----------
@@ -197,5 +185,5 @@ class PacmanAgent(Agent):
         self.nb_ghosts = state.getNumAgents() - 1
 
         # Compute next move
-        next_move = self.alphabeta_decision(state, self.depth, self.nb_ghosts)
+        next_move = self.hminimax_decision(state, self.depth, self.nb_ghosts)
         return next_move

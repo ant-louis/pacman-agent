@@ -26,7 +26,6 @@ class PacmanAgent(Agent):
         The score of the given state.
         """
         return state.getScore()
-    
 
     def get_info(self, state):
         """Returns information about a state to uniquely identify it.
@@ -46,8 +45,6 @@ class PacmanAgent(Agent):
         ghost_pos = state.getGhostPositions()        
 
         return tuple([hash(pos), hash(food), tuple(ghost_pos)])
-
-
 
     def alphabeta_decision(self, state, nb_ghosts):
         """Returns the best legal action according to the minimax algorithm.

@@ -14,8 +14,7 @@ class PacmanAgent(Agent):
         self.args = args
         self.nb_ghosts = 0
         self.visited = set()
-    
-    
+
     def score_evaluation(self, state):
         """Returns the score of the state.
         Arguments:
@@ -46,7 +45,6 @@ class PacmanAgent(Agent):
         ghost_pos = state.getGhostPositions()        
 
         return tuple([hash(pos), hash(food), tuple(ghost_pos)])
-
 
     def minimax_decision(self, state, nb_ghosts):
         """Returns the best legal action according to the minimax algorithm.
