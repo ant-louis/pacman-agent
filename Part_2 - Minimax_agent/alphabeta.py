@@ -15,18 +15,6 @@ class PacmanAgent(Agent):
         self.nb_ghosts = 0
         self.visited = set()
 
-    def score_evaluation(self, state):
-        """Returns the score of the state.
-        Arguments:
-        ----------
-        - `state`: the current game state.
-
-        Returns:
-        ----------
-        The score of the given state.
-        """
-        return state.getScore()
-
     def get_info(self, state):
         """Returns information about a state to uniquely identify it.
         Arguments:
@@ -99,7 +87,7 @@ class PacmanAgent(Agent):
         """
         # Check the terminal test
         if state.isWin() or state.isLose():
-            return self.score_evaluation(state)  # Returns the utility value
+            return state.getScore()  # Returns the utility value
         
         # Initialize value
         value = - math.inf
@@ -135,7 +123,7 @@ class PacmanAgent(Agent):
         """
         # Check the terminal test
         if state.isWin() or state.isLose():
-            return self.score_evaluation(state)  # Returns the utility value
+            return state.getScore()  # Returns the utility value
         
         # Initialize value
         value = math.inf
