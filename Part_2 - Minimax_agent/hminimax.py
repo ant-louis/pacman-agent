@@ -29,6 +29,10 @@ class PacmanAgent(Agent):
         """
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
+    def cutoff_test(self, state, depth):
+        return state.isWin() or state.isLose() or depth == 0
+
+
     def eval_state(self, state):
         """Returns a custum utility value of the state.
         Arguments:
@@ -39,15 +43,28 @@ class PacmanAgent(Agent):
         ----------
         The custom utility value at a given state.
         """
-        score = 0
-        ghost_dist = 0
-        closest_food = math.inf
-        closest_ghost = math.inf
-        nb_foods_left = math.inf
-
-        food_list = state.getFood().asList()
+        return self.safest_evaluation(state)  
+    
+    #WORKS BETTER THAN SCORE
+    def safest_evaluation(self, state):
         pacman_pos = state.getPacmanPosition()
         ghost_list = state.getGhostPositions()
+        # Get the distances from pacman to all the ghost
+        ghost_dist = 0
+        for ghost_pos in ghost_list:
+            ghost_dist += self.manhattan_distance(pacman_pos, ghost_pos) 
+        return ghost_dist
+    
+    def custom_evaluation(self, state):
+        """Returns a custum utility value of the state.
+        Arguments:
+        ----------
+        - `state`: the current game state.
+
+        Returns:
+        ----------
+        The custom utility value at a given state.
+        """
         current_score = state.getScore()
 
         # If pacman wins the game
@@ -66,28 +83,19 @@ class PacmanAgent(Agent):
         closest_ghost = min(ghost_dist)
         
         # Get the number of foods left
-        nb_foods_left = len(food_list)
+        nb_foods_left = state.getNumFood()
 
         # Compute score
-        score = 1 * current_score + \
-                -1 * (1./closest_ghost) + \
-                -1 * closest_food + \
-                -1  * nb_foods_left
-        """
+
         score = 1 * current_score + \
                 2 * max(closest_ghost, 4) + \
                 -1.5 * closest_food + \
                 -4  * nb_foods_left
 
-        """
         return score
 
-    def cutoff_test(self, state, depth):
-        """
-        """
-        return state.isWin() or state.isLose() or depth == 0
 
-    def alphabeta_decision(self, state, depth, nb_ghosts):
+    def hminimax_decision(self, state, depth, nb_ghosts):
         """Returns the best legal action according to the H-minimax algorithm.
         Arguments:
         ----------
@@ -101,16 +109,10 @@ class PacmanAgent(Agent):
         """
         values = list()
         actions = list()
-        alpha = - math.inf
-        beta = math.inf
 
         pac_successors = state.generatePacmanSuccessors()
         for next_state, next_action in pac_successors:
-            value = self.min_value(next_state, alpha, beta, depth, nb_ghosts)
-            if value >= beta:
-                return next_action
-
-            alpha = max(alpha, value)
+            value = self.min_value(next_state, depth, nb_ghosts)
             values.append(value)
             actions.append(next_action)
 
@@ -118,7 +120,7 @@ class PacmanAgent(Agent):
 
         return actions[index]
     
-    def max_value(self, state, alpha, beta, depth, ghost_index):
+    def max_value(self, state, depth, ghost_index):
         """
         Arguments:
         ----------
@@ -138,14 +140,10 @@ class PacmanAgent(Agent):
 
         pac_successors = state.generatePacmanSuccessors()
         for pac_successor in pac_successors:
-            value = max(value, self.min_value(pac_successor[0], alpha, beta, depth-1, ghost_index))
-            if value >= beta:
-                return value
-            alpha = max(alpha, value)
-        
+            value = max(value, self.min_value(pac_successor[0], depth-1, ghost_index))
         return value
 
-    def min_value(self, state, alpha, beta, depth, ghost_index):
+    def min_value(self, state, depth, ghost_index):
         """
         Arguments:
         ----------
@@ -167,14 +165,9 @@ class PacmanAgent(Agent):
         ghost_successors = state.generateGhostSuccessors(ghost_index)
         for ghost_successor in ghost_successors:
             if ghost_index > 1:
-                value = min(value, self.min_value(ghost_successor[0], alpha, beta, depth, ghost_index-1))
+                value = min(value, self.min_value(ghost_successor[0], depth, ghost_index-1))
             else:
-                value = min(value, self.max_value(ghost_successor[0], alpha, beta, depth-1, self.nb_ghosts))
-
-            if value <= alpha:
-                return value
-            beta = min(beta, value)
-
+                value = min(value, self.max_value(ghost_successor[0], depth-1, self.nb_ghosts))
         return value
 
     def get_action(self, state):
@@ -192,5 +185,6 @@ class PacmanAgent(Agent):
         self.nb_ghosts = state.getNumAgents() - 1
 
         # Compute next move
-        next_move = self.alphabeta_decision(state, self.depth, self.nb_ghosts)
+        next_move = self.hminimax_decision(state, self.depth, self.nb_ghosts)
+        
         return next_move
