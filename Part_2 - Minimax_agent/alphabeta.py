@@ -82,7 +82,7 @@ class PacmanAgent(Agent):
         """
         # Check the terminal test
         if state.isWin():
-            return state.getScore()  # Returns the utility value
+            return state.getScore()
         if state.isLose():
             return - math.inf
         
@@ -90,16 +90,15 @@ class PacmanAgent(Agent):
         value = - math.inf
 
         # Add the current node to the visited set
-        curr_info = self.get_info(state)
-        self.visited.add(curr_info)
+        self.visited.add(self.get_info(state))
 
-        pac_successors = state.generatePacmanSuccessors()
-        for pac_successor in pac_successors:
+        successors = state.generatePacmanSuccessors()
+        for succ in successors:
             # Check if it was already visited
-            if self.get_info(pac_successor[0]) in self.visited:
+            if self.get_info(succ[0]) in self.visited:
                 continue
 
-            value = max(value, self.min_value(pac_successor[0], alpha, beta, ghost_index))
+            value = max(value, self.min_value(succ[0], alpha, beta, ghost_index))
             if value >= beta:
                 return value
             alpha = max(alpha, value)
@@ -122,7 +121,7 @@ class PacmanAgent(Agent):
         """
         # Check the terminal test
         if state.isWin():
-            return state.getScore()  # Returns the utility value
+            return state.getScore()
         if state.isLose():
             return - math.inf
         
@@ -130,15 +129,14 @@ class PacmanAgent(Agent):
         value = math.inf
 
         # Add the current node to the visited set
-        curr_info = self.get_info(state)
-        self.visited.add(curr_info)
+        self.visited.add(self.get_info(state))
 
-        ghost_successors = state.generateGhostSuccessors(ghost_index)
-        for ghost_successor in ghost_successors:
+        successors = state.generateGhostSuccessors(ghost_index)
+        for succ in successors:
             if ghost_index > 1:
-                value = min(value, self.min_value(ghost_successor[0], alpha, beta, ghost_index-1))
+                value = min(value, self.min_value(succ[0], alpha, beta, ghost_index-1))
             else:
-                value = min(value, self.max_value(ghost_successor[0], alpha, beta, self.nb_ghosts))
+                value = min(value, self.max_value(succ[0], alpha, beta, self.nb_ghosts))
                 
             if value <= alpha:
                 return value
@@ -160,11 +158,12 @@ class PacmanAgent(Agent):
         -------
         - A legal move as defined in `game.Directions`.
         """
+        self.visited = set()
+
         # Get the number of ghosts in the layout
         self.nb_ghosts = state.getNumAgents() - 1
 
         # Compute next move
         next_move = self.alphabeta_decision(state, self.nb_ghosts)
-        self.visited = set()
 
         return next_move
