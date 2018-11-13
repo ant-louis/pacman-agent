@@ -50,23 +50,18 @@ class PacmanAgent(Agent):
         alpha = - math.inf
         beta = math.inf
 
+        # Add the current node to the visited set
         curr_info = self.get_info(state)
-        if curr_info not in self.visited:
-            # Add the current node to the visited set
-            self.visited.add(curr_info)
+        self.visited.add(curr_info)
 
         # For each successor of the current node  
         pac_successors = state.generatePacmanSuccessors()
-        for next_state, next_action in pac_successors:  
-            # Check if it was already visited
-            if self.get_info(next_state) in self.visited:
-                continue  
-
+        for next_state, next_action in pac_successors:
             value = self.min_value(next_state, alpha, beta, nb_ghosts)
             if value >= beta:
                 return next_action
-
             alpha = max(alpha, value)
+
             values.append(value)
             actions.append(next_action)
 
@@ -86,16 +81,17 @@ class PacmanAgent(Agent):
         The max utility value of the successor nodes.
         """
         # Check the terminal test
-        if state.isWin() or state.isLose():
+        if state.isWin():
             return state.getScore()  # Returns the utility value
+        if state.isLose():
+            return - math.inf
         
         # Initialize value
         value = - math.inf
 
+        # Add the current node to the visited set
         curr_info = self.get_info(state)
-        if curr_info not in self.visited:
-            # Add the current node to the visited set
-            self.visited.add(curr_info)
+        self.visited.add(curr_info)
 
         pac_successors = state.generatePacmanSuccessors()
         for pac_successor in pac_successors:
@@ -107,6 +103,9 @@ class PacmanAgent(Agent):
             if value >= beta:
                 return value
             alpha = max(alpha, value)
+        
+        if value == - math.inf:
+            value = math.inf
         
         return value
 
@@ -122,16 +121,17 @@ class PacmanAgent(Agent):
         The min utility value of the successor nodes.
         """
         # Check the terminal test
-        if state.isWin() or state.isLose():
+        if state.isWin():
             return state.getScore()  # Returns the utility value
+        if state.isLose():
+            return - math.inf
         
         # Initialize value
         value = math.inf
 
+        # Add the current node to the visited set
         curr_info = self.get_info(state)
-        if curr_info not in self.visited:
-            # Add the current node to the visited set
-            self.visited.add(curr_info)
+        self.visited.add(curr_info)
 
         ghost_successors = state.generateGhostSuccessors(ghost_index)
         for ghost_successor in ghost_successors:
@@ -143,6 +143,9 @@ class PacmanAgent(Agent):
             if value <= alpha:
                 return value
             beta = min(beta, value)
+        
+        if value == math.inf:
+            value = - math.inf
 
         return value
 
