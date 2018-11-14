@@ -5,6 +5,7 @@ import math
 
 
 class PacmanAgent(Agent):
+    
     def __init__(self, args):
         """
         Arguments:
@@ -108,14 +109,16 @@ class PacmanAgent(Agent):
 
     def get_action(self, state):
         """
-        Given a pacman game state, returns a legal move.
+        Given a pacman game state, returns a legal move according to the
+        Minimax algorithm.
         Arguments:
         ----------
         - `state`: the current game state. 
 
         Return:
         -------
-        - A legal move as defined in `game.Directions`.
+        - The best legal move as defined in `game.Directions`, according to
+        the Minimax algorithm.
         """
         self.visited = set()
         values = list()

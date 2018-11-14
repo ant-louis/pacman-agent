@@ -39,6 +39,10 @@ class PacmanAgent(Agent):
         Arguments:
         ----------
         - `state`: the current game state.
+        - `alpha`: the value of the best (i.e., highest-value) choice we have
+        found so far at any choice point along the path for MAX.
+        - `beta`: the value of the best (i.e., lowest-value) choice we have
+        found so far at any choice point along the path for MIN.
         - `ghost_index`: the index of the ghost agent.
 
         Returns:
@@ -79,6 +83,10 @@ class PacmanAgent(Agent):
         Arguments:
         ----------
         - `state`: the current game state.
+        - `alpha`: the value of the best (i.e., highest-value) choice we have
+        found so far at any choice point along the path for MAX.
+        - `beta`: the value of the best (i.e., lowest-value) choice we have
+        found so far at any choice point along the path for MIN.
         - `ghost_index`: the index of the ghost agent.
 
         Returns:
@@ -116,14 +124,16 @@ class PacmanAgent(Agent):
 
     def get_action(self, state):
         """
-        Given a pacman game state, returns a legal move.
+        Given a pacman game state, returns a legal move according to the
+        Alphabeta algorithm.
         Arguments:
         ----------
         - `state`: the current game state. 
 
         Return:
         -------
-        - A legal move as defined in `game.Directions`.
+        - The best legal move as defined in `game.Directions`, according to
+        the Alphabeta algorithm.
         """
         self.visited = set()
         values = list()
