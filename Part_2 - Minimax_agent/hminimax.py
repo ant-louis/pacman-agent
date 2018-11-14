@@ -14,22 +14,14 @@ class PacmanAgent(Agent):
         """
         self.args = args
         self.nb_ghosts = 0
-        self.depth = 6
+        self.depth = 4
 
-    def manhattan_distance(self,xy1, xy2):
+    def __manhattan_distance(self,xy1, xy2):
         """Returns the Manhattan distance between points.
-        Arguments:
-        ----------
-        - `xy1`: the first point.
-        - `xy2`: the second point.
-
-        Returns:
-        ----------
-        The Manhattan distance between points xy1 and xy2.
         """
         return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
-    def cutoff_test(self, state, depth):
+    def __cutoff_test(self, state, depth):
         """
         Arguments:
         ----------
@@ -43,7 +35,7 @@ class PacmanAgent(Agent):
         """
         return state.isWin() or state.isLose() or depth == 0
 
-    def eval_state(self, state):
+    def __eval_state(self, state):
         """Returns a custum utility value of the state.
         Arguments:
         ----------
@@ -56,7 +48,7 @@ class PacmanAgent(Agent):
         current_score = state.getScore()
         pacman_pos = state.getPacmanPosition()
         ghost_list = state.getGhostPositions()
-        food_list = state.getFood()
+        food_list = state.getFood().asList()
 
         # If pacman wins the game
         if state.isWin():
@@ -66,26 +58,23 @@ class PacmanAgent(Agent):
             return - math.inf
 
         # Get the distance from pacman to the closest food
-        food_dist = [self.manhattan_distance(pacman_pos, food_pos) for food_pos in food_list]
+        food_dist = [self.__manhattan_distance(pacman_pos, food_pos) for food_pos in food_list]
         closest_food = min(food_dist)
-
         # Get the distances from pacman to the closest ghost
-        ghost_dist = [self.manhattan_distance(pacman_pos, ghost_pos) for ghost_pos in ghost_list]
+        ghost_dist = [self.__manhattan_distance(pacman_pos, ghost_pos) for ghost_pos in ghost_list]
         closest_ghost = min(ghost_dist)
-        closest_ghost = max(closest_ghost, 3)
-        
         # Get the number of foods left
         nb_foods_left = state.getNumFood()
 
         # Compute score
         score = 1 * current_score + \
-                -2 * (1./closest_ghost) + \
+                -1.5 * (1./closest_ghost) + \
                 -1.5 * closest_food + \
-                -4 * nb_foods_left
+                -6 * nb_foods_left
 
         return score
     
-    def max_value(self, state, depth, ghost_index):
+    def __max_value(self, state, depth, ghost_index):
         """
         Arguments:
         ----------
@@ -98,19 +87,19 @@ class PacmanAgent(Agent):
         The max utility value of the successor nodes.
         """
         # Check cutoff
-        if self.cutoff_test(state, depth):
-            return self.eval_state(state)    
+        if self.__cutoff_test(state, depth):
+            return self.__eval_state(state)    
         
         # Initialize value
         value = - math.inf
 
         successors = state.generatePacmanSuccessors()
         for succ in successors:
-            value = max(value, self.min_value(succ[0], depth-1, ghost_index))
+            value = max(value, self.__min_value(succ[0], depth-1, ghost_index))
 
         return value
 
-    def min_value(self, state, depth, ghost_index):
+    def __min_value(self, state, depth, ghost_index):
         """
         Arguments:
         ----------
@@ -123,8 +112,8 @@ class PacmanAgent(Agent):
         The min utility value of the successor nodes.
         """
         # Check cutoff
-        if self.cutoff_test(state, depth):
-            return self.eval_state(state)
+        if self.__cutoff_test(state, depth):
+            return self.__eval_state(state)
         
         # Initialize value
         value = math.inf
@@ -132,9 +121,9 @@ class PacmanAgent(Agent):
         successors = state.generateGhostSuccessors(ghost_index)
         for succ in successors:
             if ghost_index > 1:
-                value = min(value, self.min_value(succ[0], depth, ghost_index-1))
+                value = min(value, self.__min_value(succ[0], depth, ghost_index-1))
             else:
-                value = min(value, self.max_value(succ[0], depth-1, self.nb_ghosts))
+                value = min(value, self.__max_value(succ[0], depth-1, self.nb_ghosts))
 
         return value
 
@@ -157,7 +146,7 @@ class PacmanAgent(Agent):
 
         successors = state.generatePacmanSuccessors()
         for next_state, next_action in successors:
-            value = self.min_value(next_state, self.depth, self.nb_ghosts)
+            value = self.__min_value(next_state, self.depth, self.nb_ghosts)
             values.append(value)
             actions.append(next_action)
 
