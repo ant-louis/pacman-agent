@@ -33,34 +33,6 @@ class PacmanAgent(Agent):
         ghost_pos = state.getGhostPositions()        
 
         return tuple([hash(pos), hash(food), tuple(ghost_pos)])
-
-    def minimax_decision(self, state, nb_ghosts):
-        """Returns the best legal action according to the minimax algorithm.
-        Arguments:
-        ----------
-        - `state`: the current game state.
-        - `nb_ghosts`: the number of ghosts in the grid.
-
-        Returns:
-        ----------
-        The best legal action for the defined maximal depth.
-        """
-        values = list()
-        actions = list()
-
-        # Add the current node to the visited set
-        self.visited.add(self.get_info(state))
-
-        # For each successor of the current node            
-        successors = state.generatePacmanSuccessors()
-        for next_state, next_action in successors:
-            value = self.min_value(next_state, nb_ghosts)
-            values.append(value)
-            actions.append(next_action)
-            
-        index = values.index(max(values))
-
-        return actions[index]
     
     def max_value(self, state, ghost_index):
         """
@@ -92,6 +64,7 @@ class PacmanAgent(Agent):
                 continue
             value = max(value, self.min_value(succ[0], ghost_index))
         
+        # Case in which all successors were visited
         if value == - math.inf:
             value = math.inf
 
@@ -127,6 +100,7 @@ class PacmanAgent(Agent):
             else:
                 value = min(value, self.max_value(succ[0], self.nb_ghosts))
 
+        # Case in which all successors were visited
         if value == math.inf:
             value = - math.inf
 
@@ -144,11 +118,22 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         self.visited = set()
-        
+        values = list()
+        actions = list()
+
         # Get the number of ghosts in the layout
         self.nb_ghosts = state.getNumAgents() - 1
 
-        # Compute next move
-        next_move = self.minimax_decision(state, self.nb_ghosts)
+        # Add the current node to the visited set
+        self.visited.add(self.get_info(state))
 
-        return next_move
+        # For each successor of the current node            
+        successors = state.generatePacmanSuccessors()
+        for next_state, next_action in successors:
+            value = self.min_value(next_state, self.nb_ghosts)
+            values.append(value)
+            actions.append(next_action)
+            
+        index = values.index(max(values))
+
+        return actions[index]

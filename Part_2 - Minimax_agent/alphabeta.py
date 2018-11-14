@@ -33,41 +33,6 @@ class PacmanAgent(Agent):
         ghost_pos = state.getGhostPositions()        
 
         return tuple([hash(pos), hash(food), tuple(ghost_pos)])
-
-    def alphabeta_decision(self, state, nb_ghosts):
-        """Returns the best legal action according to the minimax algorithm.
-        Arguments:
-        ----------
-        - `state`: the current game state.
-        - `nb_ghosts`: the number of ghosts in the grid.
-
-        Returns:
-        ----------
-        The best legal action 
-        """
-        values = list()
-        actions = list()
-        alpha = - math.inf
-        beta = math.inf
-
-        # Add the current node to the visited set
-        curr_info = self.get_info(state)
-        self.visited.add(curr_info)
-
-        # For each successor of the current node  
-        pac_successors = state.generatePacmanSuccessors()
-        for next_state, next_action in pac_successors:
-            value = self.min_value(next_state, alpha, beta, nb_ghosts)
-            if value >= beta:
-                return next_action
-            alpha = max(alpha, value)
-
-            values.append(value)
-            actions.append(next_action)
-
-        index = values.index(max(values))
-
-        return actions[index]
     
     def max_value(self, state, alpha, beta, ghost_index):
         """
@@ -103,6 +68,7 @@ class PacmanAgent(Agent):
                 return value
             alpha = max(alpha, value)
         
+        # Case in which all successors were visited
         if value == - math.inf:
             value = math.inf
         
@@ -142,6 +108,7 @@ class PacmanAgent(Agent):
                 return value
             beta = min(beta, value)
         
+        # Case in which all successors were visited
         if value == math.inf:
             value = - math.inf
 
@@ -159,11 +126,28 @@ class PacmanAgent(Agent):
         - A legal move as defined in `game.Directions`.
         """
         self.visited = set()
+        values = list()
+        actions = list()
+        alpha = - math.inf
+        beta = math.inf
 
         # Get the number of ghosts in the layout
         self.nb_ghosts = state.getNumAgents() - 1
 
-        # Compute next move
-        next_move = self.alphabeta_decision(state, self.nb_ghosts)
+        # Add the current node to the visited set
+        self.visited.add(self.get_info(state))
 
-        return next_move
+        # For each successor of the current node  
+        pac_successors = state.generatePacmanSuccessors()
+        for next_state, next_action in pac_successors:
+            value = self.min_value(next_state, alpha, beta, self.nb_ghosts)
+            if value >= beta:
+                return next_action
+            alpha = max(alpha, value)
+
+            values.append(value)
+            actions.append(next_action)
+
+        index = values.index(max(values))
+
+        return actions[index]
