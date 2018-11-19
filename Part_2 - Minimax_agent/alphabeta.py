@@ -3,7 +3,6 @@ from pacman_module.pacman import Directions
 import math
 
 
-
 class PacmanAgent(Agent):
 
     def __init__(self, args):
@@ -14,7 +13,6 @@ class PacmanAgent(Agent):
         """
         self.args = args
         self.nb_ghosts = 0
-        self.visited = set()
 
     def __get_info(self, state):
         """Returns information about a state to uniquely identify it.
@@ -24,18 +22,18 @@ class PacmanAgent(Agent):
 
         Returns:
         ----------
-        Tuple of 
+        Tuple of
             -the hash value of Pacmans position
             -the hash value of the food matrix
             -the tuple of ghost positions
         """
         pos = state.getPacmanPosition()
         food = state.getFood()
-        ghost_pos = state.getGhostPositions()      
+        ghost_pos = state.getGhostPositions()
 
         return tuple([hash(pos), hash(food), tuple(ghost_pos)])
 
-    def __max_value(self, state, alpha, beta, ghost_index):
+    def __max_value(self, state, alpha, beta, visited, ghost_index):
         """
         Arguments:
         ----------
@@ -51,36 +49,29 @@ class PacmanAgent(Agent):
         The max utility value of the successor nodes.
         """
         # Check the terminal test
-        if state.isWin():
+        if state.isWin() or state.isLose():
             return state.getScore()
-        if state.isLose():
-            return - math.inf
 
         # Initialize value
         value = - math.inf
 
         # Add the current node to the visited set
-        self.visited.add(self.__get_info(state))
+        visited.add(self.__get_info(state))
 
         successors = state.generatePacmanSuccessors()
         for succ in successors:
             # Check if it was already visited
-            if self.__get_info(succ[0]) in self.visited:
-                continue
-
-            value = max(value, self.__min_value(succ[0], alpha,\
-                                                beta, ghost_index))
-            if value >= beta:
-                return value
-            alpha = max(alpha, value)
-
-        # Case in which all successors were visited
-        if value == - math.inf:
-            value = math.inf
+            if self.__get_info(succ[0]) not in visited:
+                new_visited = visited.copy()
+                value = max(value, self.__min_value(succ[0], alpha, beta,
+                                                    new_visited, ghost_index))
+                if value >= beta:
+                    return value
+                alpha = max(alpha, value)
 
         return value
 
-    def __min_value(self, state, alpha, beta, ghost_index):
+    def __min_value(self, state, alpha, beta, visited, ghost_index):
         """
         Arguments:
         ----------
@@ -96,32 +87,30 @@ class PacmanAgent(Agent):
         The min utility value of the successor nodes.
         """
         # Check the terminal test
-        if state.isWin():
+        if state.isWin() or state.isLose():
             return state.getScore()
-        if state.isLose():
-            return - math.inf
 
         # Initialize value
         value = math.inf
 
         # Add the current node to the visited set
-        self.visited.add(self.__get_info(state))
+        visited.add(self.__get_info(state))
 
         successors = state.generateGhostSuccessors(ghost_index)
         for succ in successors:
-            if ghost_index > 1:
-                value = min(value, self.__min_value(succ[0], alpha,\
-                                                    beta, ghost_index-1))
-            else:
-                value = min(value, self.__max_value(succ[0], alpha,\
-                                                    beta, self.nb_ghosts))
-            if value <= alpha:
-                return value
-            beta = min(beta, value)
-
-        # Case in which all successors were visited
-        if value == math.inf:
-            value = - math.inf
+            if self.__get_info(succ[0]) not in visited:
+                new_visited = visited.copy()
+                if ghost_index > 1:
+                    value = min(value, self.__min_value(succ[0], alpha, beta,
+                                                        new_visited,
+                                                        ghost_index-1))
+                else:
+                    value = min(value, self.__max_value(succ[0], alpha, beta,
+                                                        new_visited,
+                                                        self.nb_ghosts))
+                if value <= alpha:
+                    return value
+                beta = min(beta, value)
 
         return value
 
@@ -131,14 +120,14 @@ class PacmanAgent(Agent):
         Alphabeta algorithm.
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
 
         Return:
         -------
         - The best legal move as defined in `game.Directions`, according to
         the Alphabeta algorithm.
         """
-        self.visited = set()
+        visited = set()
         alpha = - math.inf
         beta = math.inf
         best_value = - math.inf
@@ -148,17 +137,16 @@ class PacmanAgent(Agent):
         self.nb_ghosts = state.getNumAgents() - 1
 
         # Add the current node to the visited set
-        self.visited.add(self.__get_info(state))
+        visited.add(self.__get_info(state))
 
         # For each successor of the current node
         pac_successors = state.generatePacmanSuccessors()
         for next_state, next_action in pac_successors:
-            value = self.__min_value(next_state, alpha, beta, self.nb_ghosts)
+            value = self.__min_value(next_state, alpha, beta, visited,
+                                     self.nb_ghosts)
             if value > best_value:
                 best_value = value
                 best_action = next_action
-            if best_value >= beta:
-                return best_action
             alpha = max(alpha, best_value)
 
         return best_action

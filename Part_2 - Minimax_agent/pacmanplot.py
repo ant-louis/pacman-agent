@@ -24,25 +24,25 @@ def buildPlot(data, ylabel, filename):
                         loc='upper center', bbox_to_anchor=(0.5, -0.05),
                         fancybox=True, shadow=True, ncol=5)
         plt.savefig("{}_{}.svg".format(filename,ghost_type[j]), format="svg", bbox_inches='tight',pad_inches=0.0)
-        plt.show()
+        #plt.show()
 
 # Dumby ghost
 ##[Minimax, Alphabeta, Hminimax]
 dumby_score = [526, 526, 526]
-dumby_time = [0.0305, 0.0184, 0.0062]
-dumby_expanded = [243, 149, 34]
+dumby_time = [0.774, 0.0683, 0.0031]
+dumby_expanded = [9023, 750, 34]
 
 # Greedy ghost
 #[Minimax, Alphabeta, Hminimax]
 greedy_score = [526, 526, 526]
-greedy_time = [0.0302, 0.0183, 0.0059]
-greedy_expanded = [243, 149, 34]
+greedy_time = [0.781, 0.0643, 0.0034]
+greedy_expanded = [9023, 750, 34]
 
 # Smarty ghost
 #[Minimax, Alphabeta, Hminimax]
 smarty_score = [526, 526, 526]
-smarty_time = [0.0289, 0.0195, 0.0083]
-smarty_expanded = [243, 149, 34]
+smarty_time = [0.769, 0.0655, 0.0037]
+smarty_expanded = [9023, 750, 34]
 
 total_score = [
     dumby_score,

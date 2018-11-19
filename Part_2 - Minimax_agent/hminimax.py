@@ -4,7 +4,6 @@ from pacman_module.util import manhattanDistance
 import math
 
 
-
 class PacmanAgent(Agent):
 
     def __init__(self, args):
@@ -47,31 +46,28 @@ class PacmanAgent(Agent):
         food_list = state.getFood().asList()
 
         # If pacman wins the game
-        if state.isWin():
+        if state.isWin() or state.isLose():
             return current_score
-        # If pacman loses the game
-        if state.isLose():
-            return - math.inf
 
         # Get the distance from pacman to the closest food
-        food_dist = [manhattanDistance(pacman_pos, food_pos) \
-                        for food_pos in food_list]
+        food_dist = [manhattanDistance(pacman_pos, food_pos) for food_pos in
+                     food_list]
         closest_food = min(food_dist)
         # Get the distances from pacman to the closest ghost
-        ghost_dist = [manhattanDistance(pacman_pos, ghost_pos) \
-                        for ghost_pos in ghost_list]
+        ghost_dist = [manhattanDistance(pacman_pos, ghost_pos) for ghost_pos in
+                      ghost_list]
         closest_ghost = min(ghost_dist)
         # Get the number of foods left
         nb_foods_left = state.getNumFood()
 
         # Compute score
-        score = 1 * current_score + \
-                -1.5 * (1./closest_ghost) + \
-                -1.5 * closest_food + \
-                -6 * nb_foods_left
+        score = (1 * current_score -
+                 1.5 * (1./closest_ghost) -
+                 1.5 * closest_food -
+                 6 * nb_foods_left)
 
         return score
-    
+
     def __max_value(self, state, alpha, beta, depth, ghost_index):
         """
         Arguments:
@@ -90,15 +86,15 @@ class PacmanAgent(Agent):
         """
         # Check cutoff
         if self.__cutoff_test(state, depth):
-            return self.__eval_state(state)    
+            return self.__eval_state(state)
 
         # Initialize value
         value = - math.inf
 
         successors = state.generatePacmanSuccessors()
         for succ in successors:
-            value = max(value, self.__min_value(succ[0], alpha, beta,\
-                                                 depth-1, ghost_index))
+            value = max(value, self.__min_value(succ[0], alpha, beta,
+                                                depth-1, ghost_index))
             if value >= beta:
                 return value
             alpha = max(alpha, value)
@@ -131,11 +127,11 @@ class PacmanAgent(Agent):
         successors = state.generateGhostSuccessors(ghost_index)
         for succ in successors:
             if ghost_index > 1:
-                value = min(value, self.__min_value(succ[0], alpha, beta,\
-                                                     depth, ghost_index-1))
+                value = min(value, self.__min_value(succ[0], alpha, beta,
+                                                    depth, ghost_index-1))
             else:
-                value = min(value, self.__max_value(succ[0], alpha, beta,\
-                                                     depth-1, self.nb_ghosts))
+                value = min(value, self.__max_value(succ[0], alpha, beta,
+                                                    depth-1, self.nb_ghosts))
             if value <= alpha:
                 return value
             beta = min(beta, value)
@@ -147,7 +143,7 @@ class PacmanAgent(Agent):
         Given a pacman game state, returns a legal move.
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
 
         Return:
         -------
@@ -163,13 +159,11 @@ class PacmanAgent(Agent):
 
         successors = state.generatePacmanSuccessors()
         for next_state, next_action in successors:
-            value = self.__min_value(next_state, alpha, beta,\
-                                        self.depth, self.nb_ghosts)
+            value = self.__min_value(next_state, alpha, beta, self.depth,
+                                     self.nb_ghosts)
             if value > best_value:
                 best_value = value
                 best_action = next_action
-            if best_value >= beta:
-                return best_action
             alpha = max(alpha, best_value)
 
         return best_action
