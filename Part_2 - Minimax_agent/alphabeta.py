@@ -69,6 +69,9 @@ class PacmanAgent(Agent):
                     return value
                 alpha = max(alpha, value)
 
+        if value == -math.inf:
+            value = math.inf
+
         return value
 
     def __min_value(self, state, alpha, beta, visited, ghost_index):
@@ -111,6 +114,9 @@ class PacmanAgent(Agent):
                 if value <= alpha:
                     return value
                 beta = min(beta, value)
+
+        if value == math.inf:
+            value = -math.inf
 
         return value
 
