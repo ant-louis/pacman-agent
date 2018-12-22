@@ -58,7 +58,7 @@ class BeliefStateAgent(Agent):
         # Compute the belief ghost states
         for i, evidence in enumerate(evidences):
             # Reshape beliefStates to a 1D vector
-            f = self._convert_to_vector(beliefStates[i])
+            f = beliefStates[i].reshape(-1,1,order='F')
 
             # Compute observation matrix
             index = self._get_case(evidence[0], evidence[1])
@@ -70,8 +70,8 @@ class BeliefStateAgent(Agent):
             f = f/sum(f)
 
             # Transform beliefStates to a matrix
-            beliefStates[i] = self._convert_to_matrix(f)
-            
+            beliefStates[i] = f.reshape(self._width,self._height,order='F')
+
         # XXX: End of your code
 
         self.beliefGhostStates = beliefStates
@@ -236,7 +236,7 @@ class BeliefStateAgent(Agent):
         """
         Given a coordinate (x,y) of a N*M matrix where N and M are
         respectively width and height of the maze layout, returns
-        the corresponding case index in a (N*M)*(N*M) matrix.
+        the corresponding case index in a N*M array
 
         Arguments:
         ----------
@@ -265,7 +265,7 @@ class BeliefStateAgent(Agent):
         """
         N = self._width
         x = case % N
-        y = int((case-x)/N)
+        y = (case-x)//N
         return (x,y)
 
     def _get_legal_actions(self, x, y):
@@ -330,29 +330,3 @@ class BeliefStateAgent(Agent):
         
         # Return the case index of new coordinates
         return self._get_case(x, y)
-
-    def _convert_to_vector(self, matrix):
-        """
-        """
-        N = self._width
-        M = self._height
-        size = N*M 
-        vec = np.zeros((size))
-
-        for case in range(size):
-            x, y = self._get_coord(case)
-            vec[case] = matrix[x, y]
-        return vec
-    
-    def _convert_to_matrix(self, vector):
-        """
-        """
-        N = self._width
-        M = self._height
-        size = N*M 
-        matrix = np.zeros((N, M))
-
-        for case in range(size):
-            x, y = self._get_coord(case)
-            matrix[x, y] = vector[case]
-        return matrix
