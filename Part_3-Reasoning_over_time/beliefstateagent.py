@@ -61,7 +61,7 @@ class BeliefStateAgent(Agent):
             f = beliefStates[i].reshape(-1,1,order='F')
 
             # Compute observation matrix
-            index = self._get_case(evidence[0], evidence[1])
+            index = self._get_cell(evidence[0], evidence[1])
             O = np.diag(self._B[:, index])
            
             # Compute the product and normalize it
@@ -152,15 +152,15 @@ class BeliefStateAgent(Agent):
         size = N*M
         T = np.zeros((size, size))
 
-        for case in range(size):
-            # Get the coordinates of the case
-            x, y = self._get_coord(case)
+        for cell in range(size):
+            # Get the coordinates of the cell
+            x, y = self._get_coord(cell)
 
             # If it's a wall, continue
             if self.walls[x][y]:
                 continue
 
-            # Get the legal actions in that case
+            # Get the legal actions in that cell
             actions = self._get_legal_actions(x, y)
             nb_actions = len(actions)
 
@@ -168,16 +168,16 @@ class BeliefStateAgent(Agent):
             if Directions.EAST not in actions:
                 # Probabilities are uniformly distributed
                 for action in actions:
-                    next_case = self._get_next_case(case, action)
-                    T[case][next_case] = 1/nb_actions
+                    next_cell = self._get_next_cell(cell, action)
+                    T[cell][next_cell] = 1/nb_actions
             # If going east is legal, bigger probability for east action
             else:
-                next_case = self._get_next_case(case, Directions.EAST)
-                T[case][next_case] = self.p + (1-self.p)/nb_actions
+                next_cell = self._get_next_cell(cell, Directions.EAST)
+                T[cell][next_cell] = self.p + (1-self.p)/nb_actions
                 actions.remove(Directions.EAST)
                 for action in actions:
-                    next_case = self._get_next_case(case, action)
-                    T[case][next_case] = 1/nb_actions
+                    next_cell = self._get_next_cell(cell, action)
+                    T[cell][next_cell] = 1/nb_actions
         return T
     
     def _compute_sensor_matrix(self):
@@ -197,18 +197,18 @@ class BeliefStateAgent(Agent):
         W = 2*w + 1
         prob = 1/W**2
 
-        for case in range(size):
-            # Get the coordinates of the case
-            x, y = self._get_coord(case)
+        for cell in range(size):
+            # Get the coordinates of the cell
+            x, y = self._get_coord(cell)
 
-            # For each case in a square of side W around (x,y)
+            # For each cell in a square of side W around (x,y)
             for i in range(x - w, x + w + 1):
                 for j in range(y - w, y + w + 1):
-                    # If the case is in the grid
+                    # If the cell is in the grid
                     if self._in_grid(i,j):
                         # Attribute it the uniform probability
-                        evidence = self._get_case(i,j)
-                        B[case][evidence] = prob
+                        evidence = self._get_cell(i,j)
+                        B[cell][evidence] = prob
         return B
 
     def _in_grid(self, x, y):
@@ -232,11 +232,11 @@ class BeliefStateAgent(Agent):
             return False
         return True
 
-    def _get_case(self, x, y):
+    def _get_cell(self, x, y):
         """
         Given a coordinate (x,y) of a N*M matrix where N and M are
         respectively width and height of the maze layout, returns
-        the corresponding case index in a N*M array
+        the corresponding cell index in a N*M array
 
         Arguments:
         ----------
@@ -249,23 +249,23 @@ class BeliefStateAgent(Agent):
         """
         return y * self._width + x
     
-    def _get_coord(self, case):
+    def _get_coord(self, cell):
         """
-        Given a case index of a (N*M)*(N*M) matrix where N and M are
+        Given a cell index of a (N*M)*(N*M) matrix where N and M are
         respectively width and height of the maze layout, returns the
         corresponding coordinate (x,y) in a  N*M matrix.
 
         Arguments:
         ----------
-        - `case`: index between [0, N*M]
+        - `cell`: index between [0, N*M]
 
         Return:
         -------
         - A coordinate (x,y) such that 0 <= x <= N and 0 <= y <= M.
         """
         N = self._width
-        x = case % N
-        y = (case-x)//N
+        x = cell % N
+        y = (cell-x)//N
         return (x,y)
 
     def _get_legal_actions(self, x, y):
@@ -300,11 +300,11 @@ class BeliefStateAgent(Agent):
         
         return actions
     
-    def _get_next_case(self, case, action):
+    def _get_next_cell(self, cell, action):
         """
-        Given a case index in a (N*M)*(N*M) matrix where N and M are
+        Given a cell index in a (N*M)*(N*M) matrix where N and M are
         respectively width and height of the maze layout, returns
-        the next case index corresponding to a given action.
+        the next cell index corresponding to a given action.
 
         Arguments:
         ----------
@@ -315,8 +315,8 @@ class BeliefStateAgent(Agent):
         -------
         - A list of the legal actions as defined in `game.Directions`.
         """
-        # Get case coordinates
-        x, y = self._get_coord(case)
+        # Get cell coordinates
+        x, y = self._get_coord(cell)
 
         # Update it depending on the action
         if action == Directions.EAST:
@@ -328,5 +328,5 @@ class BeliefStateAgent(Agent):
         elif action == Directions.SOUTH:
             y -= 1
         
-        # Return the case index of new coordinates
-        return self._get_case(x, y)
+        # Return the cell index of new coordinates
+        return self._get_cell(x, y)
