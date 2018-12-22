@@ -3,7 +3,6 @@
 .vscode/
 __pycache__/
 pacman_module/__pycache__/
-*.pdf
 .DS_Store
 *.pyc
 Entropy_csv
