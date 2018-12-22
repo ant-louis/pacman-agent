@@ -59,6 +59,7 @@ class BeliefStateAgent(Agent):
         for i, evidence in enumerate(evidences):
             # Reshape beliefStates to a 1D vector
             f = beliefStates[i].reshape(-1,1,order='F')
+            print(f)
 
             # Compute observation matrix
             index = self._get_cell(evidence[0], evidence[1])
