@@ -8,3 +8,4 @@ pacman_module/__pycache__/
 *.pyc
 Entropy_csv
 Graphs
+Part_3-Reasoning_over_time/plots.py
