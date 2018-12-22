@@ -72,8 +72,6 @@ class BeliefStateAgent(Agent):
             # Transform beliefStates to a matrix
             beliefStates[i] = f.reshape(self._width,self._height,order='F')
 
-        # XXX: End of your code
-
         self.beliefGhostStates = beliefStates
         return beliefStates
 
@@ -139,7 +137,8 @@ class BeliefStateAgent(Agent):
 
     def _compute_transition_matrix(self):
         """
-        Compute the transition matrix T.
+        Compute the transition matrix T such that
+        T(i,j) = P(x_{t} = j | x_{t+1} = i).
 
         Return:
         -------
@@ -147,9 +146,7 @@ class BeliefStateAgent(Agent):
         where N and M are respectively width and height
         of the maze layout.
         """
-        N = self._width
-        M = self._height
-        size = N*M
+        size = self._size
         T = np.zeros((size, size))
 
         for cell in range(size):
@@ -182,7 +179,8 @@ class BeliefStateAgent(Agent):
     
     def _compute_sensor_matrix(self):
         """
-        Compute the sensor matrix B.
+        Compute the sensor matrix B such that
+        B(i,j) = P(e_{t} = j | x_{t} = i).
 
         Return:
         -------
@@ -236,12 +234,12 @@ class BeliefStateAgent(Agent):
         """
         Given a coordinate (x,y) of a N*M matrix where N and M are
         respectively width and height of the maze layout, returns
-        the corresponding cell index in a N*M array
+        the corresponding cell index in a 1D N*M array.
 
         Arguments:
         ----------
-        - `x`: coordinate on the X axis
-        - `y`: coordinate on the Y axis
+        - `x`: coordinate on the X axis between [0, N]
+        - `y`: coordinate on the Y axis between [0, M]
 
         Return:
         -------
@@ -251,9 +249,9 @@ class BeliefStateAgent(Agent):
     
     def _get_coord(self, cell):
         """
-        Given a cell index of a (N*M)*(N*M) matrix where N and M are
-        respectively width and height of the maze layout, returns the
-        corresponding coordinate (x,y) in a  N*M matrix.
+        Given a cell index of a 1D N*M array, where N and M are
+        respectively width and height of the maze layout, returns
+        the corresponding coordinate (x,y) in a  N*M matrix.
 
         Arguments:
         ----------
@@ -302,18 +300,18 @@ class BeliefStateAgent(Agent):
     
     def _get_next_cell(self, cell, action):
         """
-        Given a cell index in a (N*M)*(N*M) matrix where N and M are
+        Given a cell index in a 1D N*M array where N and M are
         respectively width and height of the maze layout, returns
         the next cell index corresponding to a given action.
 
         Arguments:
         ----------
-        - `x`: coordinate on the X axis
-        - `y`: coordinate on the Y axis
+        - `cell`: index between [0, N*M]
+        - `action`: an action as defined in `game.Directions`
 
         Return:
         -------
-        - A list of the legal actions as defined in `game.Directions`.
+        - An index between [0, N*M] after executing the action.
         """
         # Get cell coordinates
         x, y = self._get_coord(cell)
