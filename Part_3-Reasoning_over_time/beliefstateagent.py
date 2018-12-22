@@ -29,7 +29,7 @@ class BeliefStateAgent(Agent):
         self.p = self.args.p
         # Initialization variable
         self._initialized = False
-                
+
     def updateAndGetBeliefStates(self, evidences):
         """
         Given a list of (noised) distances from pacman to ghosts,
@@ -54,23 +54,23 @@ class BeliefStateAgent(Agent):
         # If first call, compute T and B
         if not self._initialized:
             self._init_all()
-        
+
         # Compute the belief ghost states
         for i, evidence in enumerate(evidences):
             # Reshape beliefStates to a 1D vector
-            f = beliefStates[i].reshape(-1,1,order='F')
+            f = beliefStates[i].reshape(-1, 1, order='F')
 
             # Compute observation matrix
             index = self._get_cell(evidence[0], evidence[1])
             O = np.diag(self._B[:, index])
-           
+
             # Compute the product and normalize it
             f = np.matmul(self._T.transpose(), f)
             f = np.matmul(O, f)
             f = f/sum(f)
 
             # Transform beliefStates to a matrix
-            beliefStates[i] = f.reshape(self._width,self._height,order='F')
+            beliefStates[i] = f.reshape(self._width, self._height, order='F')
 
         self.beliefGhostStates = beliefStates
         return beliefStates
@@ -102,7 +102,7 @@ class BeliefStateAgent(Agent):
 
         Arguments:
         ----------
-        - `state`: the current game state. 
+        - `state`: the current game state.
 
         Return:
         -------
@@ -176,7 +176,7 @@ class BeliefStateAgent(Agent):
                     next_cell = self._get_next_cell(cell, action)
                     T[cell][next_cell] = 1/nb_actions
         return T
-    
+
     def _compute_sensor_matrix(self):
         """
         Compute the sensor matrix B such that
@@ -200,12 +200,12 @@ class BeliefStateAgent(Agent):
             x, y = self._get_coord(cell)
 
             # For each cell in a square of side W around (x,y)
-            for i in range(x - w, x + w + 1):
-                for j in range(y - w, y + w + 1):
+            for i in range(x-w, x+w+1):
+                for j in range(y-w, y+w+1):
                     # If the cell is in the grid
-                    if self._in_grid(i,j):
+                    if self._in_grid(i, j):
                         # Attribute it the uniform probability
-                        evidence = self._get_cell(i,j)
+                        evidence = self._get_cell(i, j)
                         B[cell][evidence] = prob
         return B
 
@@ -246,7 +246,7 @@ class BeliefStateAgent(Agent):
         - An index i such that 0 <= i <= N*M
         """
         return y * self._width + x
-    
+
     def _get_coord(self, cell):
         """
         Given a cell index of a 1D N*M array, where N and M are
@@ -264,7 +264,7 @@ class BeliefStateAgent(Agent):
         N = self._width
         x = cell % N
         y = (cell-x)//N
-        return (x,y)
+        return (x, y)
 
     def _get_legal_actions(self, x, y):
         """
@@ -295,9 +295,9 @@ class BeliefStateAgent(Agent):
         # Check south
         if self._in_grid(x, y-1) and not self.walls[x][y-1]:
             actions.append(Directions.SOUTH)
-        
+
         return actions
-    
+
     def _get_next_cell(self, cell, action):
         """
         Given a cell index in a 1D N*M array where N and M are
@@ -325,6 +325,6 @@ class BeliefStateAgent(Agent):
             y += 1
         elif action == Directions.SOUTH:
             y -= 1
-        
+
         # Return the cell index of new coordinates
         return self._get_cell(x, y)
