@@ -1,9 +1,5 @@
 # Pacman
 
-<p align="center">
-<img src="pacman_game.png" width="50%" />
-</p>
-
 The goal of this programming project is to implement intelligent agents for the game of Pacman. The project is divided into three parts:
 - **Part 1.** You must implement a Search agent for eating all the food dots as quickly as possible.
 - **Part 2.** You must implement a Minimax agent for eating all the food dots as quickly as possible, while avoiding the ghost enemies that are chasing you.
